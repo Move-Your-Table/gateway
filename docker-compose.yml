@@ -1,16 +1,56 @@
-version: '3.3'
+version: '3.8'
 services:
-  server:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      args:
-        - http_proxy
-        - https_proxy
-        - no_proxy
-    image: gateway/server:latest
+  # gateway_dev:
+    # build:
+      # context: .
+      # dockerfile: /docker/Dev_Dockerfile
+    # image: node:14-alpine
+    # ports:
+      # - "8081:8081"
+    # volumes:
+      # - .:/app
+    # stdin_open: true  # -i
+    # tty: true         # -t
+  mongodb_dev:
+    image: mongo:5.0.4
+    container_name: MongoDB_dev
+    build: 
+      context: /submodules/back-end
+      dockerfile: /docker/Mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
-      - "8081:8081"
-    stdin_open: true  # -i
-    tty: true         # -t
-
+      - ${MONGO_PORT}:27017
+  # nest_dev:
+    # image: node:lts-alpine3.14
+    # restart: always
+    # container_name: Nest.JS
+    # ports:
+      # - ${NESTJS_PORT}:3000
+    # build:
+      # dockerfile: /docker/Nest
+      # context: /submodules/back-end
+    # volumes:
+      # - /submodules/back-end:/app
+      # - /submodules/back-end/node_modules:/app/src/node_modules
+    # depends_on:
+      # - mongodb_dev
+      # - rabbimq_dev
+  rabbitmq_dev:
+    image: rabbitmq:3.8.25-alpine
+    restart: always
+    container_name: RabbitMQ_Dev
+    ports:
+      - ${RABBITMQ_PORT}:5672
+  # automate_dev:
+    # image: rust:alpine3.14
+    # container_name: Automation-API_Dev
+    # ports:
+      # - ${WARP_PORT}:3030
+    # build:
+      # context: /submodules/automateapi
+      # dockerfile: /Dockerfile
+    # volumes:
+      # - .:/app

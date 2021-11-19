@@ -1,4 +1,8 @@
-# gateway
+# MYT Gateway
+
+MYT Gateway is... the gateway to our application. This server will give you access to the microservices framework that is powering MYT.
+
+
 
 > An awesome project based on Ts.ED framework
 
