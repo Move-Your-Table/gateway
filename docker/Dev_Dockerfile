@@ -1,12 +1,11 @@
 FROM node:14-alpine
 
 WORKDIR /app
-RUN apk update && apk add build-base git python
+RUN apk update && apk add build-base git python3
 
 COPY package.json .
 COPY yarn.lock .
 COPY ./src ./src
-COPY ./dist ./dist
 COPY ./views ./views
 
 RUN yarn install
