@@ -1,21 +1,17 @@
-import 'source-map-support/register';
+import {$log} from "@tsed/common";
+import { PlatformExpress } from "@tsed/platform-express";
+import {Server} from "./Server";
 
-// std
-import * as http from 'http';
+async function bootstrap() {
+  try {
+    $log.debug("Start server...");
+    const platform = await PlatformExpress.bootstrap(Server);
 
-// 3p
-import { Config, createApp, displayServerURL } from '@foal/core';
-
-// App
-import { AppController } from './app/app.controller';
-
-async function main() {
-  const app = await createApp(AppController);
-
-  const httpServer = http.createServer(app);
-  const port = Config.get('port', 'number', 3001);
-  httpServer.listen(port, () => displayServerURL(port));
+    await platform.listen();
+    $log.debug("Server initialized");
+  } catch (er) {
+    $log.error(er);
+  }
 }
 
-main()
-  .catch(err => { console.error(err.stack); process.exit(1); });
+bootstrap();
