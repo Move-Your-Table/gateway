@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   tsed:
+    profiles: ["container-dev"]
     build:
       context: .
       dockerfile: /docker/Dev_Dockerfile
@@ -17,6 +18,7 @@ services:
       - BACK_END_ENDPOINT=nest
       - AUTOMATION_API_ENDPOINT=automate
   mongodb:
+    profiles: ["container-dev", "local-dev"]
     image: myt/back-end-db:1.0
     container_name: MongoDB-Dev
     build: 
@@ -29,9 +31,12 @@ services:
     ports:
       - ${MONGO_PORT}:27017
   nest:
+    profiles: ["container-dev", "local-dev"]
     image: myt/back-end:1.0
     restart: always
     container_name: Back-End-Dev
+    ports:
+      - ${NESTJS_PORT}:3000
     build:
       context: /submodules/back-end
       dockerfile: /docker/Nest_Dockerfile
@@ -42,14 +47,18 @@ services:
       - AUTOMATION_API_ENDPOINT=automate
       - GATEWAY_API_ENDPOINT=tsed
   rabbitmq:
+    profiles: ["container-dev", "local-dev"]
     image: rabbitmq:3.8.25-alpine
     restart: always
     container_name: RabbitMQ-Dev
     ports:
       - ${RABBITMQ_PORT}:5672
   automate:
+    profiles: ["container-dev", "local-dev"]
     image: myt/automation-api:1.0
     container_name: Automate-API-Dev
+    ports:
+      - ${WARP_PORT}:3030
     build:
       context: /submodules/automateapi
       dockerfile: /Dockerfile
