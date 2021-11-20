@@ -1,0 +1,16 @@
+FROM node:14-alpine
+
+WORKDIR /app
+RUN apk update && apk add build-base git python3
+
+COPY package.json .
+COPY yarn.lock .
+COPY ./src ./src
+COPY ./views ./views
+
+RUN yarn install
+
+EXPOSE 8081
+ENV PORT 8081
+
+CMD [ "yarn", "start:plain" ]
