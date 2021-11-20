@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  tsed_dev:
+  tsed:
     build:
       context: .
       dockerfile: /docker/Dev_Dockerfile
@@ -12,50 +12,13 @@ services:
       - node_modules:/app/node_modules
     stdin_open: true  # -i
     tty: true         # -t
-    container_name: Gateway
-  mongodb_dev:
-    image: mongo:5.0.4
-    container_name: MongoDB
-    build: 
-      context: /submodules/back-end
-      dockerfile: /docker/Mongo_Dockerfile
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports:
-      - ${MONGO_PORT}:27017
-  nest_dev:
-    image: node:lts-alpine3.14
-    restart: always
-    container_name: Back-End
-    ports:
-      - ${NESTJS_PORT}:3000
-    build:
-      context: /submodules/back-end
-      dockerfile: /docker/Nest_Dockerfile
-    volumes:
-      - /submodules/back-end:/app
-      - /submodules/back-end/node_modules:/app/src/node_modules
-    depends_on:
-      - mongodb_dev
-      - rabbimq_dev
-  rabbitmq_dev:
+    container_name: TS.ed
+  rabbitmq:
     image: rabbitmq:3.8.25-alpine
     restart: always
     container_name: RabbitMQ
     ports:
       - ${RABBITMQ_PORT}:5672
-  automate_dev:
-    image: rust:alpine3.14
-    container_name: Automate_API
-    ports:
-      - ${WARP_PORT}:3030
-    build:
-      context: /submodules/automateapi
-      dockerfile: /Dockerfile
-    volumes:
-      - /submodules/automateapi:/app
 
 volumes:
   node_modules: {}
