@@ -10,7 +10,7 @@ MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.i
 ### Development Setup
 1. Clone this project using the following command:
    ```bash
-   $ git clone --recurse-submodules https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/gateway.git
+   $ git clone --recurse-submodules -j8 https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/gateway.git
    ```
    > :bulb: Notice the `--recurse-submodules`? This is **super important**, because it will also fetch the needed submodules.
 2. Run npm install:
@@ -22,19 +22,10 @@ MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.i
    ```bash
    $ npm run start
    ```
-   > ⏱ This will take a while the first time. Go grab a ☕ while waiting.
+   > ⏱ This might take a while when first building the application.
 
 ✅ **Done!** Normally the application should be available on `localhost:<TSED_PORT>` and should be able to contact other services.
 
-### Pulling & building new services
-If a new code is pushed to the main branch of any of the microservices, you'll need to update the code manually. Don't worry, just run the following command:
-
-```bash
-$ npm run rebuild
-```
-
-It will do all things necessary to get you up to speed with the application.
-  > ⏱ This will take a while. Go grab a ☕ while waiting .
 ## Available commands
 ### Preferred command
 - **`npm run start:dev`**:
@@ -55,15 +46,6 @@ It will do all things necessary to get you up to speed with the application.
   
   Starts a production-ready server, **without any of the necessary containers.** 
 
-### Refresh & Rebuild commands
-- **`npm run rebuild`**
-  > ⏱ This will take a while. Go grab a ☕ while waiting .
-
-  Will do the following things:
-  - Fast-forward all submodules to the latest commit on master.
-  - Take all existing down & destroy them
-  - Rebuild the needed images for them with the new code that has been received
-  - Bring these containers back online and ready for development
 
 ## Going Production
 > TODO

@@ -10,7 +10,6 @@
     "start:local": "docker-compose --profile local-dev stop && docker-compose --profile local-dev up -d",
     "start:plain": "tsnd --inspect --ignore-watch node_modules --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "start:plain:prod": "cross-env NODE_ENV=production node dist/index.js",
-    "rebuild": "git submodule update --recursive --remote && docker-compose --profile container-dev down && docker-compose --profile container-dev up -d --build",
     "test:lint": "eslint src --ext .ts",
     "test:lint:fix": "eslint src --ext .ts --fix",
     "prettier": "prettier '{src,test}/**/*.ts' --write"
