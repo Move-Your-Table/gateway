@@ -11,19 +11,14 @@ import "@tsed/swagger";
 import {config, rootDir} from "./config";
 import {IndexCtrl} from "./controllers/pages/IndexController";
 
-
 @Configuration({
   ...config,
   acceptMimes: ["application/json"],
   httpPort: process.env.TSED_PORT || 8083,
   httpsPort: false, // CHANGE
   mount: {
-    "/rest": [
-      `${rootDir}/controllers/**/*.ts`
-    ],
-    "/": [
-      IndexCtrl
-    ]
+    "/rest": [`${rootDir}/controllers/**/*.ts`],
+    "/": [IndexCtrl]
   },
   swagger: [
     {
@@ -37,9 +32,7 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
       ejs: "ejs"
     }
   },
-  exclude: [
-    "**/*.spec.ts"
-  ]
+  exclude: ["**/*.spec.ts"]
 })
 export class Server {
   @Inject()
@@ -55,8 +48,10 @@ export class Server {
       .use(compress({}))
       .use(methodOverride())
       .use(bodyParser.json())
-      .use(bodyParser.urlencoded({
-        extended: true
-      }));
+      .use(
+        bodyParser.urlencoded({
+          extended: true
+        })
+      );
   }
 }
