@@ -7,7 +7,7 @@ services:
       dockerfile: /docker/Dev_Dockerfile
     image: myt/gateway:1.0
     ports:
-      - "${TSED_PORT}:8081"
+      - "${TSED_PORT}:8080"
     volumes:
       - .:/app
       - node_modules:/app/node_modules
