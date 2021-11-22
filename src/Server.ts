@@ -34,6 +34,7 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   },
   exclude: ["**/*.spec.ts"]
 })
+@Configuration()
 export class Server {
   @Inject()
   app: PlatformApplication;
