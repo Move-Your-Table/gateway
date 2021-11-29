@@ -1,5 +1,6 @@
 import {Minimum, Property, Required} from "@tsed/schema";
 import MaskedReservation from "../Reservation/MaskedReservation";
+import Reservation from "../Reservation/Reservation";
 
 export default class Room {
   @Property()
@@ -26,6 +27,6 @@ export default class Room {
   @Property()
   features: string;
 
-  @Property(MaskedReservation)
-  reservations: Array<MaskedReservation>;
+  @Property(MaskedReservation || Reservation)
+  reservations: Array<MaskedReservation> | Array<Reservation>;
 }
