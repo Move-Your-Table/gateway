@@ -1,6 +1,6 @@
 import {Controller} from "@tsed/di";
 import {PathParams} from "@tsed/platform-params";
-import {Get, Returns} from "@tsed/schema";
+import {Get, Returns, Tags} from "@tsed/schema";
 import Building from "src/models/Building";
 
 @Controller("/buildings")
@@ -32,6 +32,7 @@ export class BuildingController {
 
   @Get("/:id")
   @Returns(200, Building)
+  @(Returns(404).Description("Not Found"))
   getById(@PathParams("id") id: number): Building {
     return {
       id: id,

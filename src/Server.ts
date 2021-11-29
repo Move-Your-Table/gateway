@@ -34,7 +34,19 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   },
   exclude: ["**/*.spec.ts"]
 })
-@Configuration()
+@Configuration({
+  rootDir: __dirname,
+  swagger: [
+    {
+      path: "/api-admin",
+      pathPatterns: ["/rest/admin/**"]
+    },
+    {
+      path: "/api-all",
+      pathPatterns: ["!/rest/admin/**"]
+    }
+  ]
+})
 export class Server {
   @Inject()
   app: PlatformApplication;
