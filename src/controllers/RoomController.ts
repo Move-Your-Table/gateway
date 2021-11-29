@@ -1,4 +1,4 @@
-import {PathParams} from "@tsed/common";
+import {PathParams, QueryParams} from "@tsed/common";
 import {Controller} from "@tsed/di";
 import {Get, Returns} from "@tsed/schema";
 import Room from "src/models/Room/Room";
@@ -8,7 +8,12 @@ export class RoomController {
   @Get("/")
   @(Returns("200", Array).Of(Room))
   @(Returns(404).Description("Not Found"))
-  findAll(@PathParams("buildingId") id: number): Array<Room> {
+  findAll(
+    @PathParams("buildingId") id: number,
+    @QueryParams("name") name: string,
+    @QueryParams("incidents") showWithIncidents: boolean = true,
+    @QueryParams("type") type: string
+  ): Array<Room> {
     const json: Array<Room> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
@@ -16,8 +21,10 @@ export class RoomController {
         buildingId: id,
         name: `R&D Room ${i}`,
         type: `R&D Room`,
-        incidents: Math.floor(10),
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i} PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+        incidents: i,
+        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${
+          5 + i
+        } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
         reservations: [
           {
             id: Math.floor(200),
@@ -29,7 +36,10 @@ export class RoomController {
       };
       json.push(element);
     }
-    return json;
+    return json
+      .filter((room) => room.name.includes(name || ""))
+      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
+      .filter((room) => room.type.includes(type || ""));
   }
 
   @Get("/:roomId")

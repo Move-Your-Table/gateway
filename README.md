@@ -76,6 +76,7 @@ It will do all things necessary to get you up to speed with the application.
 |---|---|---|---|
 |COMPOSE_PROJECT_NAME|The name of the Docker-Stack|✖|MYT_Backend|
 |RABBITMQ_PORT|The port used by RabbitMQ|✔|5672|
+|RABBITMQ_MANAGEMENT_PORT|The port used by the RabbitMQ Adminstration Panel|✔|15672|
 |MONGO_ROOT_USERNAME|The name of the root user of the database|✔|root|
 |MONGO_ROOT_PASSWORD|The password of the root user of the MongoDB|✔|zXnpa&VDpoj6RU|
 |MONGO_INITDB_DATABASE|The name of the database being used|✔|MYT|
