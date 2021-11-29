@@ -1,9 +1,9 @@
 import {Controller} from "@tsed/di";
 import {BodyParams, PathParams} from "@tsed/platform-params";
 import {Delete, Patch, Post, Returns} from "@tsed/schema";
-import Building from "src/models/Building";
-import BuildingConstructor from "src/models/BuildingConstructor";
-import BuildingMutator from "src/models/BuildingMutator";
+import Building from "src/models/Building/Building";
+import BuildingConstructor from "src/models/Building/BuildingConstructor";
+import BuildingMutator from "src/models/Building/BuildingMutator";
 import {BuildingController} from "../BuildingController";
 
 @Controller("/admin/building")

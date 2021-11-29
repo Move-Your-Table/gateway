@@ -1,15 +1,5 @@
-import {Minimum, Required} from "@tsed/schema";
+import {Minimum, Property, Required} from "@tsed/schema";
 import BuildingConstructor from "./BuildingConstructor";
-
-export default class Building extends BuildingConstructor {
-  @Required()
-  @Minimum(0)
-  id: number;
-
-  rooms: Rooms;
-
-  desks: Desks;
-}
 
 export class Rooms {
   @Required()
@@ -29,4 +19,16 @@ export class Desks {
   @Required()
   @Minimum(0)
   free: number;
+}
+
+export default class Building extends BuildingConstructor {
+  @Required()
+  @Minimum(0)
+  id: number;
+
+  @Property(Rooms)
+  rooms: Rooms;
+
+  @Property(Desks)
+  desks: Desks;
 }
