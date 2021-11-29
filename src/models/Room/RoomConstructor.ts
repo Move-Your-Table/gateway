@@ -11,8 +11,10 @@ export default class RoomConstructor {
   name: string;
 
   @Property()
+  @Required()
   type: string;
 
   @Property()
+  @Required()
   features: string;
 }

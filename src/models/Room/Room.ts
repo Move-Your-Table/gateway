@@ -1,9 +1,10 @@
-import {Minimum, Property, Required} from "@tsed/schema";
+import {CollectionOf, Generics, Minimum, Property, Required} from "@tsed/schema";
 import MaskedReservation from "../Reservation/MaskedReservation";
 import Reservation from "../Reservation/Reservation";
 import RoomConstructor from "./RoomConstructor";
 
-export default class Room extends RoomConstructor {
+@Generics("T")
+export default class Room<T> extends RoomConstructor {
   @Property()
   @Required()
   @Minimum(0)
@@ -14,5 +15,6 @@ export default class Room extends RoomConstructor {
   incidents: number;
 
   @Property(MaskedReservation || Reservation)
-  reservations: Array<MaskedReservation> | Array<Reservation>;
+  @CollectionOf("T")
+  reservations: Array<T>;
 }
