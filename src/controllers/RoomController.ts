@@ -4,9 +4,10 @@ import {Get, Returns} from "@tsed/schema";
 import Room from "src/models/Room/Room";
 
 @Controller("/building/:buildingId/room")
-export class RoomControllerController {
+export class RoomController {
   @Get("/")
   @(Returns("200", Array).Of(Room))
+  @(Returns(404).Description("Not Found"))
   findAll(@PathParams("buildingId") id: number): Array<Room> {
     const json: Array<Room> = [];
     for (let i = 0; i < 10; i++) {
@@ -16,13 +17,7 @@ export class RoomControllerController {
         name: `R&D Room ${i}`,
         type: `R&D Room`,
         incidents: Math.floor(10),
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p>
-        <ul>
-          <li>${i} workbenches</li>
-          <li>${5 + i} PCs</li>
-          <li>Excellent WI-Fi Access</li>
-          <li>LAN ports through FireWire</li>
-        </ul>`,
+        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i} PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
         reservations: [
           {
             id: Math.floor(200),
@@ -35,5 +30,27 @@ export class RoomControllerController {
       json.push(element);
     }
     return json;
+  }
+
+  @Get("/:roomId")
+  @Returns("200", Room)
+  @(Returns(404).Description("Not Found"))
+  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number) {
+    return {
+      id: rId,
+      buildingId: bId,
+      name: `R&D Room ${rId}`,
+      type: `R&D Room`,
+      incidents: Math.floor(10),
+      features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      reservations: [
+        {
+          id: Math.floor(200),
+          roomId: rId,
+          deskId: undefined,
+          dateTime: new Date()
+        }
+      ]
+    };
   }
 }
