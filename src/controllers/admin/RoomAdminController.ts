@@ -10,6 +10,7 @@ import RoomMutator from "src/models/Room/RoomMutator";
 export class RoomAdminController {
   @Get("/")
   @(Returns(404).Description("Not Found"))
+  //TODO: Fix documentation issue (Return correct object)
   @(Returns(200, Array).Of(Room).Description("OK"))
   findAll(
     @PathParams("buildingId") id: number,

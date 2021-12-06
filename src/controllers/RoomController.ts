@@ -7,6 +7,7 @@ import Room from "src/models/Room/Room";
 @Controller("/building/:buildingId/room")
 export class RoomController {
   @Get("/")
+  //TODO: Fix documentation issue (Return correct object)
   @(Returns(200, Array).Of(Room).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
