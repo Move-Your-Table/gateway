@@ -49,7 +49,7 @@ export class RoomController {
   @Get("/:roomId")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<MaskedReservation> {
+  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<MaskedReservation> {
     return {
       id: rId,
       buildingId: bId,

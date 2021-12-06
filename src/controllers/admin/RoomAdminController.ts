@@ -6,7 +6,7 @@ import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
 import RoomMutator from "src/models/Room/RoomMutator";
 
-@Controller("/admin/building/:id/room")
+@Controller("/admin/building/:buildingId/room")
 export class RoomAdminController {
   @Get("/")
   @(Returns(404).Description("Not Found"))
@@ -28,7 +28,9 @@ export class RoomAdminController {
         incidents: i,
         features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${
           5 + i
-        } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+          } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+        capacity: i,
+        floor: i,
         reservations: [
           {
             id: Math.floor(200),
@@ -63,6 +65,8 @@ export class RoomAdminController {
       type: `R&D Room`,
       incidents: Math.floor(10),
       features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: bId,
+      floor: bId,
       reservations: [
         {
           id: Math.floor(200),
@@ -84,14 +88,16 @@ export class RoomAdminController {
   @(Returns(201, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateRoom(@BodyParams() payload: RoomConstructor): Room<Reservation> {
+  CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: number,): Room<Reservation> {
     return {
       id: 22,
-      buildingId: payload.buildingId,
+      buildingId: id,
       name: payload.name,
       type: payload.features,
       incidents: 0,
       features: payload.features,
+      capacity: payload.capacity,
+      floor: payload.floor,
       reservations: []
     };
   }
@@ -110,11 +116,13 @@ export class RoomAdminController {
   ): Room<Reservation> {
     return {
       id: rId,
-      buildingId: payload.buildingId || bId,
+      buildingId: bId,
       name: payload.name || "Unchanged Building Name",
-      type: payload.type || "Unchanged features",
+      type: payload.type || "Unchanged type",
       incidents: iClear ? 0 : 10,
-      features: payload.features,
+      features: payload.features || "Unchanged features",
+      capacity: payload.capacity || 10,
+      floor: payload.floor || 1,
       reservations: rClear
         ? []
         : [
@@ -146,6 +154,8 @@ export class RoomAdminController {
       type: `R&D Room`,
       incidents: Math.floor(10),
       features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: bId,
+      floor: bId,
       reservations: [
         {
           id: Math.floor(200),
