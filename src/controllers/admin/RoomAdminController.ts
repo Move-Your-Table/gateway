@@ -1,6 +1,6 @@
-import {BodyParams, PathParams, QueryParams} from "@tsed/common";
-import {Controller} from "@tsed/di";
-import {Delete, Get, Patch, Post, Returns} from "@tsed/schema";
+import { BodyParams, PathParams, QueryParams } from "@tsed/common";
+import { Controller } from "@tsed/di";
+import { Delete, Get, Patch, Post, Returns } from "@tsed/schema";
 import Reservation from "src/models/Reservation/Reservation";
 import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
@@ -26,14 +26,14 @@ export class RoomAdminController {
         name: `R&D Room ${i}`,
         type: `R&D Room`,
         incidents: i,
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${
-          5 + i
+        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i
           } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
         capacity: i,
         floor: i,
         reservations: [
           {
             id: Math.floor(200),
+            buildingId: id,
             roomId: i,
             deskId: undefined,
             startTime: new Date(),
@@ -71,6 +71,7 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: undefined,
           startTime: new Date(),
@@ -128,20 +129,21 @@ export class RoomAdminController {
       reservations: rClear
         ? []
         : [
-            {
-              id: Math.floor(200),
-              roomId: rId,
-              deskId: undefined,
+          {
+            id: Math.floor(200),
+            buildingId: bId,
+            roomId: rId,
+            deskId: undefined,
             startTime: new Date(),
             endTime: new Date(),
-              reserved_for: {
-                id: 1,
-                first_name: "JJ",
-                last_name: "Johnson",
-                company: "NB Electronics"
-              }
+            reserved_for: {
+              id: 1,
+              first_name: "JJ",
+              last_name: "Johnson",
+              company: "NB Electronics"
             }
-          ]
+          }
+        ]
     };
   }
 
@@ -162,6 +164,7 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: undefined,
           startTime: new Date(),

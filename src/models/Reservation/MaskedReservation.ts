@@ -7,6 +7,10 @@ export default class MaskedReservation {
 
   @Property()
   @Minimum(0)
+  buildingId: number;
+
+  @Property()
+  @Minimum(0)
   roomId: number;
 
   @Property()

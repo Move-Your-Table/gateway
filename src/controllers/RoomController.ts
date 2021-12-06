@@ -1,6 +1,7 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
-import { Get, Returns } from "@tsed/schema";
+import { Example, Format, Get, Required, Returns } from "@tsed/schema";
+import { fullDateCheck } from "src/helpers/date";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
 import Room from "src/models/Room/Room";
 
@@ -32,6 +33,7 @@ export class RoomController {
           {
             id: Math.floor(200),
             roomId: i,
+            buildingId: id,
             deskId: undefined,
             startTime: new Date(),
             endTime: new Date()
@@ -63,6 +65,7 @@ export class RoomController {
         {
           id: Math.floor(200),
           roomId: rId,
+          buildingId: bId,
           deskId: undefined,
           startTime: new Date(),
           endTime: new Date()
@@ -71,25 +74,40 @@ export class RoomController {
     };
   }
 
+  //TODO: Implement Regex Validation for Query Parameter
+  //      Normally, TS.ed provides a function for that, but currently I do not get it to function
+  //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
   @Get("/:roomId/reservations")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   getReservationsPerRoom(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @QueryParams("day") day: Date
+    @PathParams("buildingId")
+    bId: number,
+    @PathParams("roomId")
+    rId: number,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
   ): Array<MaskedReservation> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
-        roomId: i,
+        id: i,
+        buildingId: bId,
+        roomId: rId,
         deskId: undefined,
         startTime: new Date(),
         endTime: new Date()
       }
       json.push(element);
     };
-    return json;
+    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }
+
+
+

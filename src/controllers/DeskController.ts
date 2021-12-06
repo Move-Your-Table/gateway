@@ -32,6 +32,7 @@ export class DeskController {
         reservations: [
           {
             id: Math.floor(200),
+            buildingId: bId,
             roomId: rId,
             deskId: i,
             startTime: new Date(),
@@ -64,6 +65,7 @@ export class DeskController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: dId,
           startTime: new Date(),
