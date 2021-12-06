@@ -1,6 +1,6 @@
 import {BodyParams, PathParams, QueryParams} from "@tsed/common";
 import {Controller} from "@tsed/di";
-import {Get, Patch, Post, Returns} from "@tsed/schema";
+import {Delete, Get, Patch, Post, Returns} from "@tsed/schema";
 import Reservation from "src/models/Reservation/Reservation";
 import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
@@ -9,8 +9,8 @@ import RoomMutator from "src/models/Room/RoomMutator";
 @Controller("/admin/building/:id/room")
 export class RoomAdminController {
   @Get("/")
-  @(Returns(200, Array).Of(Room).Nested(Reservation))
   @(Returns(404).Description("Not Found"))
+  @(Returns(200, Array).Of(Room).Description("OK"))
   findAll(
     @PathParams("buildingId") id: number,
     @QueryParams("name") name: string,
@@ -83,7 +83,7 @@ export class RoomAdminController {
   @(Returns(201, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateBuilding(@BodyParams() payload: RoomConstructor): Room<Reservation> {
+  CreateRoom(@BodyParams() payload: RoomConstructor): Room<Reservation> {
     return {
       id: 22,
       buildingId: payload.buildingId,
@@ -95,12 +95,12 @@ export class RoomAdminController {
     };
   }
 
-  @Patch("/:id")
+  @Patch("/:roomId")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  EditBuilding(
+  EditRoom(
     @PathParams("buildingId") bId: number,
     @PathParams("roomId") rId: number,
     @QueryParams("clearIncidents") iClear: boolean,
@@ -130,6 +130,35 @@ export class RoomAdminController {
               }
             }
           ]
+    };
+  }
+
+  @Delete("/:roomId")
+  @(Returns(200, Room).Of(Reservation))
+  @(Returns(403).Description("Unauthorized"))
+  @(Returns(404).Description("Not Found"))
+  DeleteRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
+    return {
+      id: rId,
+      buildingId: bId,
+      name: `R&D Room ${rId}`,
+      type: `R&D Room`,
+      incidents: Math.floor(10),
+      features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      reservations: [
+        {
+          id: Math.floor(200),
+          roomId: rId,
+          deskId: undefined,
+          dateTime: new Date(),
+          reserved_for: {
+            id: 1,
+            first_name: "JJ",
+            last_name: "Johnson",
+            company: "NB Electronics"
+          }
+        }
+      ]
     };
   }
 }

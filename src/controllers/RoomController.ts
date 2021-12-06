@@ -2,13 +2,12 @@ import {PathParams, QueryParams} from "@tsed/common";
 import {Controller} from "@tsed/di";
 import {Get, Returns} from "@tsed/schema";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
-import Reservation from "src/models/Reservation/Reservation";
 import Room from "src/models/Room/Room";
 
 @Controller("/building/:buildingId/room")
 export class RoomController {
   @Get("/")
-  @(Returns(200, Array).Of(Room).Nested(Reservation))
+  @(Returns(200, Array).Of(Room).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
     @PathParams("buildingId") id: number,

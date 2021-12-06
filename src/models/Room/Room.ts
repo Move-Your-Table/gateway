@@ -14,7 +14,7 @@ export default class Room<T> extends RoomConstructor {
   @Minimum(0)
   incidents: number;
 
-  @Property(MaskedReservation || Reservation)
+  @Property(Reservation || MaskedReservation)
   @CollectionOf("T")
-  reservations: Array<T>;
+  reservations: T[];
 }
