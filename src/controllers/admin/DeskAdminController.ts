@@ -1,8 +1,9 @@
 import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
-import {Get, Post, Returns} from "@tsed/schema";
+import {Get, Patch, Post, Returns} from "@tsed/schema";
 import Desk from "src/models/Desks/Desk";
 import DeskConstructor from "src/models/Desks/DeskConstructor";
+import DeskMutator from "src/models/Desks/DeskMutator";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
 import Reservation from "src/models/Reservation/Reservation";
 
@@ -92,7 +93,8 @@ export class DeskAdminController {
   CreateDesk(
     @BodyParams() payload: DeskConstructor, 
     @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,): Desk<Reservation> {
+    @PathParams("roomId") rId: number
+  ): Desk<Reservation> {
     return {
       id: 22,
       buildingId: bId,
@@ -104,6 +106,48 @@ export class DeskAdminController {
       capacity: payload.capacity,
       floor: payload.floor,
       reservations: []
+    };
+  }
+
+  @Patch("/:deskId")
+  @(Returns(200, Desk).Of(Reservation))
+  @(Returns(400).Description("Bad Request"))
+  @(Returns(403).Description("Unauthorized"))
+  @(Returns(404).Description("Not Found"))
+  EditRoom(
+    @PathParams("buildingId") bId: number,
+    @PathParams("roomId") rId: number,
+    @PathParams("deskId") dId: number,
+    @QueryParams("clearIncidents") iClear: boolean,
+    @QueryParams("clearReservations") rClear: boolean,
+    @BodyParams() payload: DeskMutator
+  ): Desk<Reservation> {
+    return {
+      id: dId,
+      buildingId: bId,
+      roomId: rId,
+      name: payload.name || "Unchanged Desk Name",
+      type: payload.type || "Unchanged type",
+      incidents: iClear ? 0 : 10,
+      features: payload.features || "Unchanged features",
+      capacity: payload.capacity || 10,
+      floor: payload.floor || 1,
+      reservations: rClear
+        ? []
+        : [
+          {
+            id: Math.floor(200),
+            roomId: rId,
+            deskId: undefined,
+            dateTime: new Date(),
+            reserved_for: {
+              id: 1,
+              first_name: "JJ",
+              last_name: "Johnson",
+              company: "NB Electronics"
+            }
+          }
+        ]
     };
   }
 }

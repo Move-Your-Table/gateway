@@ -116,13 +116,13 @@ export class RoomAdminController {
   ): Room<Reservation> {
     return {
       id: rId,
-      buildingId: payload.buildingId || bId,
+      buildingId: bId,
       name: payload.name || "Unchanged Building Name",
-      type: payload.type || "Unchanged features",
+      type: payload.type || "Unchanged type",
       incidents: iClear ? 0 : 10,
-      features: payload.features,
+      features: payload.features || "Unchanged features",
       capacity: payload.capacity || 10,
-      floor: payload.floor || 10,
+      floor: payload.floor || 1,
       reservations: rClear
         ? []
         : [
