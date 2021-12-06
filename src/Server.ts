@@ -23,7 +23,7 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   swagger: [
     {
       name: 'general-api',
-      path: "/api-all",
+      path: "/api-general",
       doc: "general-api",
       specVersion: "3.0.3"
     },

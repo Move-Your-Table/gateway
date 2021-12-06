@@ -1,25 +1,8 @@
-import {Minimum, Property, string} from "@tsed/schema";
+import {Minimum, Property} from "@tsed/schema";
+import ReservationConstructor from "./ReservationConstructor";
 
-export default class MaskedReservation {
+export default class MaskedReservation extends ReservationConstructor{
   @Property()
   @Minimum(0)
   id: number;
-
-  @Property()
-  @Minimum(0)
-  buildingId: number;
-
-  @Property()
-  @Minimum(0)
-  roomId: number;
-
-  @Property()
-  @Minimum(0)
-  deskId?: number;
-
-  @Property()
-  startTime: Date;
-
-  @Property()
-  endTime: Date
 }
