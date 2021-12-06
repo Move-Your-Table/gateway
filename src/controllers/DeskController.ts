@@ -34,7 +34,8 @@ export class DeskController {
             id: Math.floor(200),
             roomId: rId,
             deskId: i,
-            dateTime: new Date()
+            startTime: new Date(),
+            endTime: new Date()
           }
         ]
       };
@@ -65,7 +66,8 @@ export class DeskController {
           id: Math.floor(200),
           roomId: rId,
           deskId: dId,
-          dateTime: new Date()
+          startTime: new Date(),
+          endTime: new Date()
         }
       ]
     };

@@ -37,7 +37,8 @@ export class DeskAdminController {
             id: Math.floor(200),
             roomId: rId,
             deskId: i,
-            dateTime: new Date(),
+            startTime: new Date(),
+            endTime: new Date(),
             reserved_for: {
               id: 1,
               first_name: "JJ",
@@ -74,7 +75,8 @@ export class DeskAdminController {
           id: Math.floor(200),
           roomId: rId,
           deskId: dId,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",
@@ -139,7 +141,8 @@ export class DeskAdminController {
             id: Math.floor(200),
             roomId: rId,
             deskId: undefined,
-            dateTime: new Date(),
+            startTime: new Date(),
+            endTime: new Date(),
             reserved_for: {
               id: 1,
               first_name: "JJ",
@@ -171,7 +174,8 @@ export class DeskAdminController {
           id: Math.floor(200),
           roomId: rId,
           deskId: dId,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",

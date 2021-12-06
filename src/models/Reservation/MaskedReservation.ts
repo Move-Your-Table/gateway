@@ -1,4 +1,4 @@
-import {Minimum, Property} from "@tsed/schema";
+import {Minimum, Property, string} from "@tsed/schema";
 
 export default class MaskedReservation {
   @Property()
@@ -14,5 +14,8 @@ export default class MaskedReservation {
   deskId?: number;
 
   @Property()
-  dateTime: Date;
+  startTime: Date;
+
+  @Property()
+  endTime: Date
 }
