@@ -20,4 +20,9 @@ export default class BuildingMutator {
   @Nullable(String)
   @MinLength(2)
   postcode: string;
+
+  @Property()
+  @Nullable(String)
+  @MinLength(2)
+  country: string;
 }

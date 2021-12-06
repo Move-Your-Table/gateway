@@ -1,4 +1,4 @@
-import {Property, Required, Minimum} from "@tsed/schema";
+import { Property, Required, Minimum } from "@tsed/schema";
 
 export default class RoomConstructor {
   @Property()
@@ -17,4 +17,13 @@ export default class RoomConstructor {
   @Property()
   @Required()
   features: string;
+
+  @Property()
+  @Minimum(1)
+  @Required()
+  capacity: number;
+
+  @Property()
+  @Required()
+  floor: number;
 }

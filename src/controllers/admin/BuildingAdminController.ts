@@ -38,6 +38,7 @@ export class BuildingAdminController {
       street: payload.street || "Unchanged Street Name",
       city: payload.city || "Unchanged City",
       postcode: payload.postcode || "Unchanged Code",
+      country: payload.country || "Unchanged Country",
       rooms: {
         total: Math.floor(200),
         free: Math.floor(200)
@@ -60,6 +61,7 @@ export class BuildingAdminController {
       street: `Spire Street ${id}`,
       city: `City ${id}`,
       postcode: "9000",
+      country: "Belgium",
       rooms: {
         total: 100,
         free: 50
