@@ -1,21 +1,9 @@
 import {MaxLength, MinLength, Required} from "@tsed/schema";
+import BuildingLocation from "./BuildingLocation";
 
-export default class BuildingConstructor {
+export default class BuildingConstructor extends BuildingLocation{
   @Required()
   @MinLength(2)
   @MaxLength(60)
   name: string;
-
-  @Required()
-  @MinLength(2)
-  @MaxLength(60)
-  street: string;
-
-  @Required()
-  @MinLength(2)
-  city: string;
-
-  @Required()
-  @MinLength(2)
-  postcode: string;
 }

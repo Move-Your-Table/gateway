@@ -2,5 +2,6 @@
   "printWidth": 140,
   "bracketSpacing": false,
   "trailingComma": "none",
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "endOfLine": "auto"
 }

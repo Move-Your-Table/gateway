@@ -15,6 +15,7 @@ export class BuildingController {
         name: `Building Name ${i}`,
         street: `Street Name ${i}`,
         city: `City ${i}`,
+        country: "Belgium",
         postcode: "9000E",
         rooms: {
           total: 100 + i,
@@ -40,6 +41,7 @@ export class BuildingController {
       street: `Spire Street ${id}`,
       city: `City ${id}`,
       postcode: "9000",
+      country: "Belgium",
       rooms: {
         total: 100,
         free: 50
