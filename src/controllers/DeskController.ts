@@ -32,8 +32,8 @@ export class DeskController {
         reservations: [
           {
             id: Math.floor(200),
-            roomId: i,
-            deskId: undefined,
+            roomId: rId,
+            deskId: i,
             dateTime: new Date()
           }
         ]
@@ -44,5 +44,30 @@ export class DeskController {
       .filter((room) => room.name.includes(name || ""))
       .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
       .filter((room) => room.type.includes(type || ""));
+  }
+
+  @Get("/:deskId")
+  @(Returns(200, Desk).Of(MaskedReservation))
+  @(Returns(404).Description("Not Found"))
+  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
+    return {
+      id: dId,
+      buildingId: bId,
+      roomId: rId,
+      name: `Dual Desk ${dId}`,
+      type: `Dual Desk`,
+      incidents: dId,
+      features: `<p>A double-sized desks, perfect for sharing with 2 coworkers!</p><ul><li>${dId} desk lamps</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: dId,
+      floor: dId,
+      reservations: [
+        {
+          id: Math.floor(200),
+          roomId: rId,
+          deskId: dId,
+          dateTime: new Date()
+        }
+      ]
+    };
   }
 }
