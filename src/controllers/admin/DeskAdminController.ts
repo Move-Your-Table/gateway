@@ -1,6 +1,6 @@
 import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
-import {Get, Patch, Post, Returns} from "@tsed/schema";
+import {Delete, Get, Patch, Post, Returns} from "@tsed/schema";
 import Desk from "src/models/Desks/Desk";
 import DeskConstructor from "src/models/Desks/DeskConstructor";
 import DeskMutator from "src/models/Desks/DeskMutator";
@@ -114,7 +114,7 @@ export class DeskAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  EditRoom(
+  EditDesk(
     @PathParams("buildingId") bId: number,
     @PathParams("roomId") rId: number,
     @PathParams("deskId") dId: number,
@@ -148,6 +148,38 @@ export class DeskAdminController {
             }
           }
         ]
+    };
+  }
+
+  @Delete("/:deskId")
+  @(Returns(200, Desk).Of(Reservation))
+  @(Returns(403).Description("Unauthorized"))
+  @(Returns(404).Description("Not Found"))
+  DeleteDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number,): Desk<Reservation> {
+    return {
+      id: dId,
+      buildingId: bId,
+      roomId: rId,
+      name: `Dual Desk ${dId}`,
+      type: `Dual Desk`,
+      incidents: dId,
+      features: `<p>A double-sized desks, perfect for sharing with 2 coworkers!</p><ul><li>${dId} desk lamps</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: dId,
+      floor: dId,
+      reservations: [
+        {
+          id: Math.floor(200),
+          roomId: rId,
+          deskId: dId,
+          dateTime: new Date(),
+          reserved_for: {
+            id: 1,
+            first_name: "JJ",
+            last_name: "Johnson",
+            company: "NB Electronics"
+          }
+        }
+      ]
     };
   }
 }
