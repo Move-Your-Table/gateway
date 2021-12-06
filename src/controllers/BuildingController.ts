@@ -1,12 +1,12 @@
 import {Controller} from "@tsed/di";
 import {PathParams} from "@tsed/platform-params";
-import {Get, Returns, Tags} from "@tsed/schema";
-import Building from "src/models/Building";
+import {Get, Returns} from "@tsed/schema";
+import Building from "src/models/Building/Building";
 
 @Controller("/buildings")
 export class BuildingController {
   @Get()
-  @Returns(200, Building)
+  @(Returns(200, Array).Of(Building))
   findAll(): Array<Building> {
     const json: Array<Building> = [];
     for (let i = 0; i < 10; i++) {
