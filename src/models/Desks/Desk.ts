@@ -10,6 +10,16 @@ export default class Desk<T> extends DeskConstructor{
     id: number;
 
     @Property()
+    @Required()
+    @Minimum(0)
+    buildingId: number;
+
+    @Property()
+    @Required()
+    @Minimum(0)
+    roomId: number;
+
+    @Property()
     @Minimum(0)
     incidents: number;
 

@@ -11,6 +11,11 @@ export default class Room<T> extends RoomConstructor {
   id: number;
 
   @Property()
+  @Required()
+  @Minimum(0)
+  buildingId: number;
+
+  @Property()
   @Minimum(0)
   incidents: number;
 

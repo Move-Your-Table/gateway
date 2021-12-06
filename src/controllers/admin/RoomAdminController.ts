@@ -6,7 +6,7 @@ import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
 import RoomMutator from "src/models/Room/RoomMutator";
 
-@Controller("/admin/building/:id/room")
+@Controller("/admin/building/:buildingId/room")
 export class RoomAdminController {
   @Get("/")
   @(Returns(404).Description("Not Found"))
@@ -88,10 +88,10 @@ export class RoomAdminController {
   @(Returns(201, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateRoom(@BodyParams() payload: RoomConstructor): Room<Reservation> {
+  CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: number,): Room<Reservation> {
     return {
       id: 22,
-      buildingId: payload.buildingId,
+      buildingId: id,
       name: payload.name,
       type: payload.features,
       incidents: 0,

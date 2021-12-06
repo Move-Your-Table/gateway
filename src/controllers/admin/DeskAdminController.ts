@@ -1,7 +1,8 @@
-import { PathParams, QueryParams } from "@tsed/common";
+import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
-import {Get, Returns} from "@tsed/schema";
+import {Get, Post, Returns} from "@tsed/schema";
 import Desk from "src/models/Desks/Desk";
+import DeskConstructor from "src/models/Desks/DeskConstructor";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
 import Reservation from "src/models/Reservation/Reservation";
 
@@ -81,6 +82,28 @@ export class DeskAdminController {
           }
         }
       ]
+    };
+  }
+
+  @Post()
+  @(Returns(201, Desk).Of(Reservation))
+  @(Returns(400).Description("Bad Request"))
+  @(Returns(403).Description("Unauthorized"))
+  CreateDesk(
+    @BodyParams() payload: DeskConstructor, 
+    @PathParams("buildingId") bId: number,
+    @PathParams("roomId") rId: number,): Desk<Reservation> {
+    return {
+      id: 22,
+      buildingId: bId,
+      roomId: rId,
+      name: payload.name,
+      type: payload.features,
+      incidents: 0,
+      features: payload.features,
+      capacity: payload.capacity,
+      floor: payload.floor,
+      reservations: []
     };
   }
 }
