@@ -22,8 +22,17 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   },
   swagger: [
     {
-      path: "/v3/docs",
-      specVersion: "3.0.1"
+      name: 'general-api',
+      path: "/api-all",
+      doc: "general-api",
+      specVersion: "3.0.3"
+    },
+    {
+      name: 'admin-api',
+      path: "/api-admin",
+      doc: "admin-api",
+      pathPatterns: ["/rest/admin/**"],
+      specVersion: "3.0.3"
     }
   ],
   views: {
@@ -34,19 +43,7 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   },
   exclude: ["**/*.spec.ts"]
 })
-@Configuration({
-  rootDir: __dirname,
-  swagger: [
-    {
-      path: "/api-admin",
-      pathPatterns: ["/rest/admin/**"]
-    },
-    {
-      path: "/api-all",
-      pathPatterns: ["!/rest/admin/**"]
-    }
-  ]
-})
+
 export class Server {
   @Inject()
   app: PlatformApplication;

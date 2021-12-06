@@ -1,13 +1,17 @@
-import {Controller} from "@tsed/di";
-import {BodyParams, PathParams} from "@tsed/platform-params";
-import {Delete, Patch, Post, Returns} from "@tsed/schema";
+import { Controller } from "@tsed/di";
+import { BodyParams, PathParams } from "@tsed/platform-params";
+import { Delete, Patch, Post, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
 import Building from "src/models/Building/Building";
 import BuildingConstructor from "src/models/Building/BuildingConstructor";
 import BuildingMutator from "src/models/Building/BuildingMutator";
 
 @Controller("/admin/building")
+@Tags("Buildings")
+@Docs("admin-api")
 export class BuildingAdminController {
   @Post()
+  @Summary("Creates a building 🎊")
   @Returns(201, Building)
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
@@ -31,6 +35,7 @@ export class BuildingAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
+  @Summary("Edits a building 🥽")
   EditBuilding(@PathParams("id") id: number, @BodyParams() payload: BuildingMutator) {
     return {
       id: id,
@@ -51,6 +56,7 @@ export class BuildingAdminController {
   }
 
   @Delete("/:id")
+  @Summary("Deletes a building 🧨")
   @Returns(200, Building)
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))

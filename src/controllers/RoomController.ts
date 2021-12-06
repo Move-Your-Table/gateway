@@ -1,14 +1,19 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
-import { Example, Format, Get, Required, Returns } from "@tsed/schema";
+import { Description, Example, Format, Get, Name, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
 import { fullDateCheck } from "src/helpers/date";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
 import Room from "src/models/Room/Room";
 
 @Controller("/building/:buildingId/room")
+@Docs("general-api")
+@Tags("Rooms")
 export class RoomController {
   @Get("/")
+  @Summary("Get all rooms with 🎭 reservations.")
   //TODO: Fix documentation issue (Return correct object)
+  //TODO: Hide controller when Admin API sheet is loaded
   @(Returns(200, Array).Of(Room).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
@@ -51,6 +56,7 @@ export class RoomController {
   @Get("/:roomId")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
+  @Summary("Returns 🔑-identified room with 🎭 reservations")
   findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<MaskedReservation> {
     return {
       id: rId,
@@ -78,8 +84,9 @@ export class RoomController {
   //      Normally, TS.ed provides a function for that, but currently I do not get it to function
   //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
   @Get("/:roomId/reservations")
-  @(Returns(200, Room).Of(MaskedReservation))
+  @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
+  @Summary("Returns 🎭 reservations of a 🔑-identified  room")
   getReservationsPerRoom(
     @PathParams("buildingId")
     bId: number,

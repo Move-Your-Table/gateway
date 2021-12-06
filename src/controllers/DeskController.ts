@@ -1,13 +1,19 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
-import {Get, Returns} from "@tsed/schema";
+import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
+import { fullDateCheck } from "src/helpers/date";
 import Desk from "src/models/Desks/Desk";
 import MaskedReservation from "src/models/Reservation/MaskedReservation";
 
 @Controller("/building/:buildingId/room/:roomId/desks")
+@Docs("general-api")
+@Tags("Desks")
 export class DeskController {
   @Get("/")
+  @Summary("Get all desks with reservations")
   //TODO: Fix documentation issue (Return correct object)
+  //TODO: Hide controller when Admin API sheet is loaded
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
@@ -49,6 +55,7 @@ export class DeskController {
   }
 
   @Get("/:deskId")
+  @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
@@ -73,5 +80,42 @@ export class DeskController {
         }
       ]
     };
+  }
+
+  //TODO: Implement Regex Validation for Query Parameter
+  //      Normally, TS.ed provides a function for that, but currently I do not get it to function
+  //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
+  @Get("/:deskId/reservations")
+  @Summary("Get 🎭 reservations of a 🔑-identified desk")
+  @(Returns(200, Array).Of(MaskedReservation))
+  @(Returns(404).Description("Not Found"))
+  getReservationsPerRoom(
+    @PathParams("buildingId")
+    bId: number,
+    @PathParams("roomId")
+    rId: number,
+    @PathParams("deskId")
+    dId: number,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
+  ): Array<MaskedReservation> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
+    const json: Array<MaskedReservation> = []
+    for (let i = 0; i < 10; i++) {
+      const element = {
+        id: i,
+        buildingId: bId,
+        roomId: rId,
+        deskId: dId,
+        startTime: new Date(),
+        endTime: new Date()
+      }
+      json.push(element);
+    };
+    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }

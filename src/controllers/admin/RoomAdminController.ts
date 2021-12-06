@@ -1,14 +1,19 @@
 import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
-import { Delete, Get, Patch, Post, Returns } from "@tsed/schema";
+import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
+import { fullDateCheck } from "src/helpers/date";
 import Reservation from "src/models/Reservation/Reservation";
 import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
 import RoomMutator from "src/models/Room/RoomMutator";
 
 @Controller("/admin/building/:buildingId/room")
+@Docs("admin-api")
+@Tags("Rooms")
 export class RoomAdminController {
   @Get("/")
+  @Summary("Get all rooms with 🔍 detailed reservations")
   @(Returns(404).Description("Not Found"))
   //TODO: Fix documentation issue (Return correct object)
   @(Returns(200, Array).Of(Room).Description("OK"))
@@ -58,6 +63,7 @@ export class RoomAdminController {
   @Get("/:roomId")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(404).Description("Not Found"))
+  @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
   findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
     return {
       id: rId,
@@ -91,6 +97,7 @@ export class RoomAdminController {
   @(Returns(201, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
+  @Summary("Create a new room 🎊")
   CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: number,): Room<Reservation> {
     return {
       id: 22,
@@ -110,6 +117,7 @@ export class RoomAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
+  @Summary("Edit a 🔑-identified room 🥽")
   EditRoom(
     @PathParams("buildingId") bId: number,
     @PathParams("roomId") rId: number,
@@ -151,6 +159,7 @@ export class RoomAdminController {
   @(Returns(200, Room).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
+  @Summary("Delete a 🔑-identified room 🧨")
   DeleteRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
     return {
       id: rId,
@@ -178,5 +187,46 @@ export class RoomAdminController {
         }
       ]
     };
+  }
+
+  //TODO: Implement Regex Validation for Query Parameter
+  //      Normally, TS.ed provides a function for that, but currently I do not get it to function
+  //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
+  @Get("/:roomId/reservations")
+  @(Returns(200, Array).Of(Reservation))
+  @(Returns(404).Description("Not Found"))
+  @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
+  getReservationsPerRoom(
+    @PathParams("buildingId")
+    bId: number,
+    @PathParams("roomId")
+    rId: number,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
+  ): Array<Reservation> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
+    const json: Array<Reservation> = []
+    for (let i = 0; i < 10; i++) {
+      const element = {
+        id: i,
+        buildingId: bId,
+        roomId: rId,
+        deskId: undefined,
+        startTime: new Date(),
+        endTime: new Date(),
+        reserved_for: {
+          id: 1,
+          first_name: "JJ",
+          last_name: "Johnson",
+          company: "NB Electronics"
+        }
+      }
+      json.push(element);
+    };
+    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }
