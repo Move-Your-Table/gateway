@@ -4,7 +4,7 @@ services:
     profiles: ["container-dev"]
     build:
       context: .
-      dockerfile: /docker/Dev_Dockerfile
+      dockerfile: ./docker/Dev_Dockerfile
     image: myt/gateway:1.0
     ports:
       - "${TSED_PORT}:8080"
@@ -22,8 +22,8 @@ services:
     image: myt/back-end-db:1.0
     container_name: MongoDB-Dev
     build: 
-      context: /submodules/back-end
-      dockerfile: /docker/Mongo_Dockerfile
+      context: ./submodules/back-end
+      dockerfile: ./docker/Mongo_Dockerfile
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -38,11 +38,11 @@ services:
     ports:
       - ${NESTJS_PORT}:3000
     build:
-      context: /submodules/back-end
-      dockerfile: /docker/Nest_Dockerfile
+      context: ./submodules/back-end
+      dockerfile: ./docker/Nest_Dockerfile
     depends_on:
-      - mongodb_dev
-      - rabbimq_dev
+      - mongodb
+      - rabbitmq
     environment:
       - AUTOMATION_API_ENDPOINT=automate
       - GATEWAY_API_ENDPOINT=tsed
@@ -61,8 +61,8 @@ services:
     ports:
       - ${WARP_PORT}:3030
     build:
-      context: /submodules/automateapi
-      dockerfile: /Dockerfile
+      context: ./submodules/automateapi
+      dockerfile: ./Dockerfile
     environment:
       - BACK_END_ENDPOINT=nest
       - GATEWAY_API_ENDPOINT=tsed
