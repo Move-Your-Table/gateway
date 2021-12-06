@@ -28,7 +28,9 @@ export class RoomAdminController {
         incidents: i,
         features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${
           5 + i
-        } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+          } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+        capacity: i,
+        floor: i,
         reservations: [
           {
             id: Math.floor(200),
@@ -63,6 +65,8 @@ export class RoomAdminController {
       type: `R&D Room`,
       incidents: Math.floor(10),
       features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: bId,
+      floor: bId,
       reservations: [
         {
           id: Math.floor(200),
@@ -92,6 +96,8 @@ export class RoomAdminController {
       type: payload.features,
       incidents: 0,
       features: payload.features,
+      capacity: payload.capacity,
+      floor: payload.floor,
       reservations: []
     };
   }
@@ -115,6 +121,8 @@ export class RoomAdminController {
       type: payload.type || "Unchanged features",
       incidents: iClear ? 0 : 10,
       features: payload.features,
+      capacity: payload.capacity || 10,
+      floor: payload.floor || 10,
       reservations: rClear
         ? []
         : [
@@ -146,6 +154,8 @@ export class RoomAdminController {
       type: `R&D Room`,
       incidents: Math.floor(10),
       features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      capacity: bId,
+      floor: bId,
       reservations: [
         {
           id: Math.floor(200),
