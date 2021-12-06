@@ -15,7 +15,6 @@ export class RoomAdminController {
   @Get("/")
   @Summary("Get all rooms with 🔍 detailed reservations")
   @(Returns(404).Description("Not Found"))
-  //TODO: Fix documentation issue (Return correct object)
   @(Returns(200, Array).Of(Room).Description("OK"))
   findAll(
     @PathParams("buildingId") id: number,
@@ -189,9 +188,6 @@ export class RoomAdminController {
     };
   }
 
-  //TODO: Implement Regex Validation for Query Parameter
-  //      Normally, TS.ed provides a function for that, but currently I do not get it to function
-  //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
   @Get("/:roomId/reservations")
   @(Returns(200, Array).Of(Reservation))
   @(Returns(404).Description("Not Found"))

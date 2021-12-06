@@ -12,8 +12,6 @@ import MaskedReservation from "src/models/Reservation/MaskedReservation";
 export class DeskController {
   @Get("/")
   @Summary("Get all desks with reservations")
-  //TODO: Fix documentation issue (Return correct object)
-  //TODO: Hide controller when Admin API sheet is loaded
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
@@ -82,9 +80,6 @@ export class DeskController {
     };
   }
 
-  //TODO: Implement Regex Validation for Query Parameter
-  //      Normally, TS.ed provides a function for that, but currently I do not get it to function
-  //      Regex -> "^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$""
   @Get("/:deskId/reservations")
   @Summary("Get 🎭 reservations of a 🔑-identified desk")
   @(Returns(200, Array).Of(MaskedReservation))
