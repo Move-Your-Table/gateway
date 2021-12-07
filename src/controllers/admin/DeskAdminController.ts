@@ -1,6 +1,8 @@
 import { BodyParams, PathParams, QueryParams } from "@tsed/common";
-import {Controller} from "@tsed/di";
-import {Delete, Get, Patch, Post, Returns} from "@tsed/schema";
+import { Controller } from "@tsed/di";
+import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
+import { fullDateCheck } from "src/helpers/date";
 import Desk from "src/models/Desks/Desk";
 import DeskConstructor from "src/models/Desks/DeskConstructor";
 import DeskMutator from "src/models/Desks/DeskMutator";
@@ -8,9 +10,11 @@ import MaskedReservation from "src/models/Reservation/MaskedReservation";
 import Reservation from "src/models/Reservation/Reservation";
 
 @Controller("/admin/building/:buildingId/room/:roomId/desks")
+@Docs("admin-api")
+@Tags("Desks")
 export class DeskAdminController {
   @Get("/")
-  //TODO: Fix documentation issue (Return correct object)
+  @Summary("Get all desks with 🔍 detailed reservations")
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
@@ -35,9 +39,11 @@ export class DeskAdminController {
         reservations: [
           {
             id: Math.floor(200),
+            buildingId: bId,
             roomId: rId,
             deskId: i,
-            dateTime: new Date(),
+            startTime: new Date(),
+            endTime: new Date(),
             reserved_for: {
               id: 1,
               first_name: "JJ",
@@ -56,6 +62,7 @@ export class DeskAdminController {
   }
 
   @Get("/:deskId")
+  @Summary("Get a 🔑-identified desk with 🔍 detailed reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<Reservation> {
@@ -72,9 +79,11 @@ export class DeskAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: dId,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",
@@ -87,11 +96,12 @@ export class DeskAdminController {
   }
 
   @Post()
+  @Summary("Create a new desk 🎊")
   @(Returns(201, Desk).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   CreateDesk(
-    @BodyParams() payload: DeskConstructor, 
+    @BodyParams() payload: DeskConstructor,
     @PathParams("buildingId") bId: number,
     @PathParams("roomId") rId: number
   ): Desk<Reservation> {
@@ -110,6 +120,7 @@ export class DeskAdminController {
   }
 
   @Patch("/:deskId")
+  @Summary("Edit a 🔑-identified desk 🥽")
   @(Returns(200, Desk).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
@@ -137,9 +148,11 @@ export class DeskAdminController {
         : [
           {
             id: Math.floor(200),
+            buildingId: bId,
             roomId: rId,
-            deskId: undefined,
-            dateTime: new Date(),
+            deskId: dId,
+            startTime: new Date(),
+            endTime: new Date(),
             reserved_for: {
               id: 1,
               first_name: "JJ",
@@ -152,6 +165,7 @@ export class DeskAdminController {
   }
 
   @Delete("/:deskId")
+  @Summary("Delete a 🔑-identified desk 🧨")
   @(Returns(200, Desk).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
@@ -169,9 +183,11 @@ export class DeskAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: dId,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",
@@ -181,5 +197,43 @@ export class DeskAdminController {
         }
       ]
     };
+  }
+
+  @Get("/:roomId/reservations")
+  @(Returns(200, Array).Of(Reservation))
+  @(Returns(404).Description("Not Found"))
+  @Summary("Get 🔍 detailed reservations of a 🔑-identified desk")
+  getReservationsPerRoom(
+    @PathParams("buildingId")
+    bId: number,
+    @PathParams("roomId")
+    rId: number,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
+  ): Array<Reservation> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
+    const json: Array<Reservation> = []
+    for (let i = 0; i < 10; i++) {
+      const element = {
+        id: i,
+        buildingId: bId,
+        roomId: rId,
+        deskId: undefined,
+        startTime: new Date(),
+        endTime: new Date(),
+        reserved_for: {
+          id: 1,
+          first_name: "JJ",
+          last_name: "Johnson",
+          company: "NB Electronics"
+        }
+      }
+      json.push(element);
+    };
+    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }

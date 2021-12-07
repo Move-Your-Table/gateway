@@ -1,16 +1,20 @@
-import {BodyParams, PathParams, QueryParams} from "@tsed/common";
-import {Controller} from "@tsed/di";
-import {Delete, Get, Patch, Post, Returns} from "@tsed/schema";
+import { BodyParams, PathParams, QueryParams } from "@tsed/common";
+import { Controller } from "@tsed/di";
+import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Docs } from "@tsed/swagger";
+import { fullDateCheck } from "src/helpers/date";
 import Reservation from "src/models/Reservation/Reservation";
 import Room from "src/models/Room/Room";
 import RoomConstructor from "src/models/Room/RoomConstructor";
 import RoomMutator from "src/models/Room/RoomMutator";
 
 @Controller("/admin/building/:buildingId/room")
+@Docs("admin-api")
+@Tags("Rooms")
 export class RoomAdminController {
   @Get("/")
+  @Summary("Get all rooms with 🔍 detailed reservations")
   @(Returns(404).Description("Not Found"))
-  //TODO: Fix documentation issue (Return correct object)
   @(Returns(200, Array).Of(Room).Description("OK"))
   findAll(
     @PathParams("buildingId") id: number,
@@ -26,17 +30,18 @@ export class RoomAdminController {
         name: `R&D Room ${i}`,
         type: `R&D Room`,
         incidents: i,
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${
-          5 + i
+        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i
           } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
         capacity: i,
         floor: i,
         reservations: [
           {
             id: Math.floor(200),
+            buildingId: id,
             roomId: i,
             deskId: undefined,
-            dateTime: new Date(),
+            startTime: new Date(),
+            endTime: new Date(),
             reserved_for: {
               id: 1,
               first_name: "JJ",
@@ -57,6 +62,7 @@ export class RoomAdminController {
   @Get("/:roomId")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(404).Description("Not Found"))
+  @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
   findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
     return {
       id: rId,
@@ -70,9 +76,11 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: undefined,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",
@@ -88,6 +96,7 @@ export class RoomAdminController {
   @(Returns(201, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
+  @Summary("Create a new room 🎊")
   CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: number,): Room<Reservation> {
     return {
       id: 22,
@@ -107,6 +116,7 @@ export class RoomAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
+  @Summary("Edit a 🔑-identified room 🥽")
   EditRoom(
     @PathParams("buildingId") bId: number,
     @PathParams("roomId") rId: number,
@@ -126,19 +136,21 @@ export class RoomAdminController {
       reservations: rClear
         ? []
         : [
-            {
-              id: Math.floor(200),
-              roomId: rId,
-              deskId: undefined,
-              dateTime: new Date(),
-              reserved_for: {
-                id: 1,
-                first_name: "JJ",
-                last_name: "Johnson",
-                company: "NB Electronics"
-              }
+          {
+            id: Math.floor(200),
+            buildingId: bId,
+            roomId: rId,
+            deskId: undefined,
+            startTime: new Date(),
+            endTime: new Date(),
+            reserved_for: {
+              id: 1,
+              first_name: "JJ",
+              last_name: "Johnson",
+              company: "NB Electronics"
             }
-          ]
+          }
+        ]
     };
   }
 
@@ -146,6 +158,7 @@ export class RoomAdminController {
   @(Returns(200, Room).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
+  @Summary("Delete a 🔑-identified room 🧨")
   DeleteRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
     return {
       id: rId,
@@ -159,9 +172,11 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
+          buildingId: bId,
           roomId: rId,
           deskId: undefined,
-          dateTime: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
           reserved_for: {
             id: 1,
             first_name: "JJ",
@@ -171,5 +186,43 @@ export class RoomAdminController {
         }
       ]
     };
+  }
+
+  @Get("/:roomId/reservations")
+  @(Returns(200, Array).Of(Reservation))
+  @(Returns(404).Description("Not Found"))
+  @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
+  getReservationsPerRoom(
+    @PathParams("buildingId")
+    bId: number,
+    @PathParams("roomId")
+    rId: number,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
+  ): Array<Reservation> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
+    const json: Array<Reservation> = []
+    for (let i = 0; i < 10; i++) {
+      const element = {
+        id: i,
+        buildingId: bId,
+        roomId: rId,
+        deskId: undefined,
+        startTime: new Date(),
+        endTime: new Date(),
+        reserved_for: {
+          id: 1,
+          first_name: "JJ",
+          last_name: "Johnson",
+          company: "NB Electronics"
+        }
+      }
+      json.push(element);
+    };
+    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }
