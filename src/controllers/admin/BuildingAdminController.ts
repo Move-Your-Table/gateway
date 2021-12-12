@@ -2,9 +2,9 @@ import { Controller } from "@tsed/di";
 import { BodyParams, PathParams } from "@tsed/platform-params";
 import { Delete, Patch, Post, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import Building from "src/models/Building/Building";
-import BuildingConstructor from "src/models/Building/BuildingConstructor";
-import BuildingMutator from "src/models/Building/BuildingMutator";
+import Building from "../../models/Building/Building";
+import BuildingConstructor from "../../models/Building/BuildingConstructor";
+import BuildingMutator from "../../models/Building/BuildingMutator";
 
 @Controller("/admin/building")
 @Tags("Buildings")

@@ -2,11 +2,11 @@ import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "src/helpers/date";
-import Reservation from "src/models/Reservation/Reservation";
-import Room from "src/models/Room/Room";
-import RoomConstructor from "src/models/Room/RoomConstructor";
-import RoomMutator from "src/models/Room/RoomMutator";
+import { fullDateCheck } from "../../helpers/date";
+import Reservation from "../../models/Reservation/Reservation";
+import Room from "../../models/Room/Room";
+import RoomConstructor from "../../models/Room/RoomConstructor";
+import RoomMutator from "../../models/Room/RoomMutator";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")

@@ -1,19 +1,26 @@
-FROM node:lts
+# Build the application
+FROM node:lts as build
 
 WORKDIR /app
 RUN apt update --quiet
 RUN apt-get install git python3 --quiet
 
-COPY package.json .
-COPY yarn.lock .
-COPY ./src ./src
-COPY ./dist ./dist
-COPY ./views ./views
+COPY . .
+RUN yarn install --quiet
+RUN yarn build
 
+# Run the application
+FROM node:lts-alpine as runtime
+
+WORKDIR /app
+COPY ./package.json .
+COPY ./yarn.lock .
+COPY ./views ./views
+COPY --from=build /app/dist ./dist
 RUN yarn install --production
 
-EXPOSE 8081
-ENV PORT 8081
+EXPOSE 8080
+ENV PORT 8080
 ENV NODE_ENV production
 
-CMD ["yarn", "start:prod"]
+CMD ["node", "dist/index.js"]
