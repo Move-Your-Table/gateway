@@ -1,0 +1,19 @@
+FROM node:lts
+
+WORKDIR /app
+RUN apt update --quiet
+RUN apt-get install git python3 --quiet
+
+COPY package.json .
+COPY yarn.lock .
+COPY ./src ./src
+COPY ./dist ./dist
+COPY ./views ./views
+
+RUN yarn install --production
+
+EXPOSE 8081
+ENV PORT 8081
+ENV NODE_ENV production
+
+CMD ["yarn", "start:prod"]

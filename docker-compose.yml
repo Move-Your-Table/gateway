@@ -1,11 +1,10 @@
 version: '3.8'
 services:
   tsed_dev:
-    profiles: ["container-dev"]
     build:
       context: .
-      dockerfile: ./docker/Dev_Dockerfile
-    image: myt/gateway:1.0
+      dockerfile: ./docker/Tsed_Dev_Dockerfile
+    image: myt/gateway:dev
     ports:
       - "${TSED_PORT}:8080"
     volumes:
@@ -15,13 +14,30 @@ services:
     tty: true         # -t
     container_name: Gateway-Dev
     environment:
-      - BACK_END_ENDPOINT=nest
-      - AUTOMATION_API_ENDPOINT=automate
-  rabbitmq_dev:
-    profiles: ["container-dev", "local-dev"]
-    image: rabbitmq:3.9.10-management-alpine
-    restart: always
-    container_name: RabbitMQ-Dev
+      - TSED_PORT=8080
+      - BACK_END_ENDPOINT=nest_staging
+      - AUTOMATION_API_ENDPOINT=rust_prod
+    networks:
+      default:
+        aliases:
+          - "tsed"
+  tsed_prod:
+    container_name: Gateway-Prod
+    build:
+      context: .
+      dockerfile: ./docker/Tsed_Prod_Dockerfile
+    image: myt/gateway:prod
     ports:
-      - ${RABBITMQ_PORT}:5672
-      - ${RABBITMQ_MANAGEMENT_PORT}:15672
+      - "${TSED_PORT}:8080"
+    environment:
+      - TSED_PORT=8080
+      - BACK_END_ENDPOINT=nest_staging
+      - AUTOMATION_API_ENDPOINT=rust_prod
+    networks:
+      default:
+        aliases:
+          - "tsed"
+
+networks:
+  default:
+    name: myt
