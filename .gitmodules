@@ -1,6 +1,0 @@
-[submodule "submodules/back-end"]
-	path = submodules/back-end
-	url = git@git.ti.howest.be:TI/2021-2022/s5/trending-topics/projects/hybrid-work1/back-end.git
-[submodule "submodules/automateapi"]
-	path = submodules/automateapi
-	url = git@git.ti.howest.be:TI/2021-2022/s5/trending-topics/projects/hybrid-work1/automateapi.git
