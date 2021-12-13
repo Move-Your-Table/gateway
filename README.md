@@ -44,7 +44,7 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 |`npm run start:prod`|Starts a production-ready server **locally**|
 |||
 |`npm run start:container`|Start a fully **containerized** development server **with** hot-reloading capabilities.|
-|`start:container:prod`|Start a fully **containerized** production server|
+|`npm run start:container:prod`|Start a fully **containerized** production server|
   
 
 # Miscellaneous
