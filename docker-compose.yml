@@ -15,8 +15,10 @@ services:
     container_name: Gateway-Dev
     environment:
       - TSED_PORT=8080
-      - BACK_END_ENDPOINT=nestjs
+      - BACK_END_ENDPOINT=nest
+      - BACK_END_PORT=3000
       - AUTOMATION_API_ENDPOINT=rust
+      - AUTOMATION_API_PORT=3030
     networks:
       default:
         aliases:
@@ -33,7 +35,9 @@ services:
     environment:
       - TSED_PORT=8080
       - BACK_END_ENDPOINT=nest
+      - BACK_END_PORT=3000
       - AUTOMATION_API_ENDPOINT=rust
+      - AUTOMATION_API_PORT=3030
     networks:
       default:
         aliases:
