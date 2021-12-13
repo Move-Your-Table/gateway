@@ -35,9 +35,15 @@ export class RoomController {
         reservations: [
           {
             id: Math.floor(200),
-            roomId: i,
-            buildingId: id,
-            deskId: undefined,
+            room: {
+              id: i,
+              name: `R&D Room`
+            },
+            building: {
+              id: id,
+              name: `The Spire`
+            },
+            desk: undefined,
             startTime: new Date(),
             endTime: new Date()
           }
@@ -68,9 +74,15 @@ export class RoomController {
       reservations: [
         {
           id: Math.floor(200),
-          roomId: rId,
-          buildingId: bId,
-          deskId: undefined,
+          room: {
+            id: rId,
+            name: `R&D Room`
+          },
+          building: {
+            id: bId,
+            name: `The Spire`
+          },
+          desk: undefined,
           startTime: new Date(),
           endTime: new Date()
         }
@@ -98,10 +110,16 @@ export class RoomController {
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        deskId: undefined,
+        id: Math.floor(200),
+        room: {
+          id: rId,
+          name: `R&D Room`
+        },
+        building: {
+          id: bId,
+          name: `The Spire`
+        },
+        desk: undefined,
         startTime: new Date(),
         endTime: new Date()
       }

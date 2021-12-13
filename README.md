@@ -56,7 +56,7 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 |COMPOSE_PROJECT_NAME|Name of the compose stack|✖|✖|✖|MYT Automate Server|
 |||||||
 |TSED_PORT|The port used to reach the application from external networks|✔|✔|✔|8080|
-|AUTOMATE_ENDPOINT|The endpoint used by the application to reach the automate server|✔* </br> *\*If the code's running locally*|✖|✖|localhost|
-|AUTOMATE_PORT|The port used by the application to reach the automate server|✔* </br> *\*If the code's running locally*|✖|✖|3000|
+|AUTOMATE_API_ENDPOINT|The endpoint used by the application to reach the automate server|✔* </br> *\*If the code's running locally*|✖|✖|localhost|
+|AUTOMATE_API_PORT|The port used by the application to reach the automate server|✔* </br> *\*If the code's running locally*|✖|✖|3000|
 |BACKEND_ENDPOINT|The endpoint used by the application to reach the back-end server|✔* </br> *\*If the code's running locally*|✖|✖|localhost|
 |BACKEND_PORT|The port used by the application to reach the back-end server|✔* </br> *\*If the code's running locally*|✖|✖|8080|

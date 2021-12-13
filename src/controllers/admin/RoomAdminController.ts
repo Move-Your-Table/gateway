@@ -37,9 +37,15 @@ export class RoomAdminController {
         reservations: [
           {
             id: Math.floor(200),
-            buildingId: id,
-            roomId: i,
-            deskId: undefined,
+            room: {
+              id: i,
+              name: `R&D Room`
+            },
+            building: {
+              id: id,
+              name: `The Spire`
+            },
+            desk: undefined,
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
@@ -76,9 +82,15 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
-          buildingId: bId,
-          roomId: rId,
-          deskId: undefined,
+          room: {
+            id: rId,
+            name: `R&D Room`
+          },
+          building: {
+            id: bId,
+            name: `The Spire`
+          },
+          desk: undefined,
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
@@ -138,9 +150,15 @@ export class RoomAdminController {
         : [
           {
             id: Math.floor(200),
-            buildingId: bId,
-            roomId: rId,
-            deskId: undefined,
+            room: {
+              id: rId,
+              name: `R&D Room`
+            },
+            building: {
+              id: bId,
+              name: `The Spire`
+            },
+            desk: undefined,
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
@@ -172,9 +190,15 @@ export class RoomAdminController {
       reservations: [
         {
           id: Math.floor(200),
-          buildingId: bId,
-          roomId: rId,
-          deskId: undefined,
+          room: {
+            id: rId,
+            name: `R&D Room`
+          },
+          building: {
+            id: bId,
+            name: `The Spire`
+          },
+          desk: undefined,
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
@@ -208,10 +232,16 @@ export class RoomAdminController {
     const json: Array<Reservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        deskId: undefined,
+        id: Math.floor(200),
+        room: {
+          id: rId,
+          name: `R&D Room`
+        },
+        building: {
+          id: bId,
+          name: `The Spire`
+        },
+        desk: undefined,
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {

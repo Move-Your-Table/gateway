@@ -18,9 +18,18 @@ export class ReservationController {
     for (let i = 0; i < 10; i++) {
       const element = {
         id: i + 1,
-        buildingId: i + 2,
-        roomId: i + 3,
-        deskId: i + 4,
+        building: {
+          id: i + 2,
+          name: `building ${i + 2}`
+        },
+        room: {
+          id: i + 3,
+          name: `room ${i + 3}`
+        },
+        desk: {
+          id: i + 4,
+          name: `room ${i + 4}`
+        },
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {
@@ -44,9 +53,20 @@ export class ReservationController {
   createReservation(@BodyParams() payload: ReservationConstructor): Reservation {
     return {
       id: Math.floor(200),
-      buildingId: payload.buildingId,
-      roomId: payload.roomId,
-      deskId: payload.deskId,
+      building: {
+        id: payload.buildingId,
+        name: `building ${payload.buildingId}`
+      },
+      room: {
+        id: payload.roomId,
+        name: `room ${payload.roomId}`
+      },
+      desk: (payload.deskId)
+        ? {
+          id: payload.deskId,
+          name: `desk ${payload.deskId}`
+        }
+        : undefined,
       startTime: new Date(),
       endTime: new Date(),
       reserved_for: {
@@ -67,9 +87,18 @@ export class ReservationController {
   editReservation(@BodyParams() payload: ReservationMutator, @PathParams("reservationId") rId: number): Reservation {
     return {
       id: rId,
-      buildingId: payload.buildingId || 0,
-      roomId: payload.roomId || 0,
-      deskId: payload.deskId || 0,
+      building: {
+        id: payload.buildingId || 0,
+        name: (payload.buildingId) ? "Changed name" : "Unchanged name"
+      },
+      room: {
+        id: payload.roomId || 0,
+        name: (payload.roomId) ? "Changed name" : "Unchanged name"
+      },
+      desk: {
+        id: payload.deskId || 0,
+        name: (payload.deskId) ? "Changed name" : "Unchanged name"
+      },
       startTime: new Date(payload.startTime) || new Date(),
       endTime: new Date(payload.endTime) || new Date(),
       reserved_for: {
@@ -88,9 +117,18 @@ export class ReservationController {
   deleteReservation(): Reservation {
     return {
       id: Math.floor(200),
-      buildingId: 1,
-      roomId: 2,
-      deskId: 6,
+      building: {
+        id: 6,
+        name: `building 6`
+      },
+      room: {
+        id: 2,
+        name: `room 2`
+      },
+      desk: {
+        id: 4,
+        name: `desk 4`
+      },
       startTime: new Date(),
       endTime: new Date(),
       reserved_for: {
