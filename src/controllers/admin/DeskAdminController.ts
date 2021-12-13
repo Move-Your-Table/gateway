@@ -2,12 +2,12 @@ import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "src/helpers/date";
-import Desk from "src/models/Desks/Desk";
-import DeskConstructor from "src/models/Desks/DeskConstructor";
-import DeskMutator from "src/models/Desks/DeskMutator";
-import MaskedReservation from "src/models/Reservation/MaskedReservation";
-import Reservation from "src/models/Reservation/Reservation";
+import { fullDateCheck } from "../../helpers/date";
+import Desk from "../../models/Desks/Desk";
+import DeskConstructor from "../../models/Desks/DeskConstructor";
+import DeskMutator from "../../models/Desks/DeskMutator";
+import MaskedReservation from "../../models/Reservation/MaskedReservation";
+import Reservation from "../../models/Reservation/Reservation";
 
 @Controller("/admin/building/:buildingId/room/:roomId/desks")
 @Docs("admin-api")

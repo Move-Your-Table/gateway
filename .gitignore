@@ -59,3 +59,6 @@ test/**/*.js.map
 .env
 
 # End of https://www.toptal.com/developers/gitignore/api/dotenv
+
+# Only use YARN!
+package-lock.json

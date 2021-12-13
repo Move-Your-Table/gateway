@@ -2,7 +2,7 @@ import { Controller } from "@tsed/di";
 import { PathParams } from "@tsed/platform-params";
 import { Get, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import Building from "src/models/Building/Building";
+import Building from "../models/Building/Building";
 
 @Controller("/buildings")
 @Tags("Buildings")

@@ -9,7 +9,8 @@ import cors from "cors";
 import "@tsed/ajv";
 import "@tsed/swagger";
 import {config, rootDir} from "./config";
-import {IndexCtrl} from "./controllers/pages/IndexController";
+import { IndexCtrl } from "./controllers/pages/IndexController";
+
 
 @Configuration({
   ...config,
@@ -22,13 +23,11 @@ import {IndexCtrl} from "./controllers/pages/IndexController";
   },
   swagger: [
     {
-      name: 'general-api',
       path: "/api-general",
       doc: "general-api",
       specVersion: "3.0.3"
     },
     {
-      name: 'admin-api',
       path: "/api-admin",
       doc: "admin-api",
       pathPatterns: ["/rest/admin/**"],

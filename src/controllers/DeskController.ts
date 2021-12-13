@@ -2,9 +2,9 @@ import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
 import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "src/helpers/date";
-import Desk from "src/models/Desks/Desk";
-import MaskedReservation from "src/models/Reservation/MaskedReservation";
+import { fullDateCheck } from "../helpers/date";
+import Desk from "../models/Desks/Desk";
+import MaskedReservation from "../models/Reservation/MaskedReservation";
 
 @Controller("/building/:buildingId/room/:roomId/desks")
 @Docs("general-api")

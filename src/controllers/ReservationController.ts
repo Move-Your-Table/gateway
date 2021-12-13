@@ -2,9 +2,9 @@ import { Controller } from "@tsed/di";
 import { BodyParams, PathParams, QueryParams } from "@tsed/platform-params";
 import { Delete, Description, Get, Minimum, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import Reservation from "src/models/Reservation/Reservation";
-import ReservationConstructor from "src/models/Reservation/ReservationConstructor";
-import ReservationMutator from "src/models/Reservation/ReservationMutator";
+import Reservation from "../models/Reservation/Reservation";
+import ReservationConstructor from "../models/Reservation/ReservationConstructor";
+import ReservationMutator from "../models/Reservation/ReservationMutator";
 
 @Controller("/reservations")
 @Docs("admin-api", "general-api")

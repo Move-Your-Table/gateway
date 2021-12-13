@@ -1,71 +1,45 @@
 version: '3.8'
 services:
-  tsed:
-    profiles: ["container-dev"]
+  tsed_dev:
     build:
       context: .
-      dockerfile: ./docker/Dev_Dockerfile
-    image: myt/gateway:1.0
+      dockerfile: ./docker/Tsed_Dev_Dockerfile
+    image: myt/gateway:dev
     ports:
       - "${TSED_PORT}:8080"
     volumes:
       - .:/app
-      - node_modules:/app/node_modules
+      - ./node_modules:/app/node_modules
     stdin_open: true  # -i
     tty: true         # -t
     container_name: Gateway-Dev
     environment:
-      - BACK_END_ENDPOINT=nest
-      - AUTOMATION_API_ENDPOINT=automate
-  mongodb:
-    profiles: ["container-dev", "local-dev"]
-    image: myt/back-end-db:1.0
-    container_name: MongoDB-Dev
-    build: 
-      context: ./submodules/back-end
-      dockerfile: ./docker/Mongo_Dockerfile
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports:
-      - ${MONGO_PORT}:27017
-  nest:
-    profiles: ["container-dev", "local-dev"]
-    image: myt/back-end:1.0
-    restart: always
-    container_name: Back-End-Dev
-    ports:
-      - ${NESTJS_PORT}:3000
+      - TSED_PORT=8080
+      - BACK_END_ENDPOINT=nestjs
+      - AUTOMATION_API_ENDPOINT=rust
+    networks:
+      default:
+        aliases:
+          - tsed
+          - tsed_dev
+  tsed_prod:
+    container_name: Gateway-Prod
     build:
-      context: ./submodules/back-end
-      dockerfile: ./docker/Nest_Dockerfile
-    depends_on:
-      - mongodb
-      - rabbitmq
-    environment:
-      - AUTOMATION_API_ENDPOINT=automate
-      - GATEWAY_API_ENDPOINT=tsed
-  rabbitmq:
-    profiles: ["container-dev", "local-dev"]
-    image: rabbitmq:3.9.10-management-alpine
-    restart: always
-    container_name: RabbitMQ-Dev
+      context: .
+      dockerfile: ./docker/Tsed_Prod_Dockerfile
+    image: myt/gateway:prod
     ports:
-      - ${RABBITMQ_PORT}:5672
-      - ${RABBITMQ_MANAGEMENT_PORT}:15672
-  automate:
-    profiles: ["container-dev", "local-dev"]
-    image: myt/automation-api:1.0
-    container_name: Automate-API-Dev
-    ports:
-      - ${WARP_PORT}:3030
-    build:
-      context: ./submodules/automateapi
-      dockerfile: ./Dockerfile
+      - "${TSED_PORT}:8080"
     environment:
+      - TSED_PORT=8080
       - BACK_END_ENDPOINT=nest
-      - GATEWAY_API_ENDPOINT=tsed
+      - AUTOMATION_API_ENDPOINT=rust
+    networks:
+      default:
+        aliases:
+          - tsed
+          - tsed_prod
 
-volumes:
-  node_modules: {}
+networks:
+  default:
+    name: myt
