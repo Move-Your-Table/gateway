@@ -5,4 +5,10 @@ export default class MaskedReservation extends ReservationDetails{
   @Property()
   @Minimum(0)
   id: number;
+
+  @Property()
+  startTime: Date;
+
+  @Property()
+  endTime: Date
 }

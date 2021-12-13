@@ -39,9 +39,18 @@ export class DeskAdminController {
         reservations: [
           {
             id: Math.floor(200),
-            buildingId: bId,
-            roomId: rId,
-            deskId: i,
+            room: {
+              id: rId,
+              name: `R&D Room`
+            },
+            building: {
+              id: bId,
+              name: `The Spire`
+            },
+            desk: {
+              id: i,
+              name: `Desk ${i}`
+            },
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
@@ -79,9 +88,18 @@ export class DeskAdminController {
       reservations: [
         {
           id: Math.floor(200),
-          buildingId: bId,
-          roomId: rId,
-          deskId: dId,
+          room: {
+            id: rId,
+            name: `R&D Room`
+          },
+          building: {
+            id: bId,
+            name: `The Spire`
+          },
+          desk: {
+            id: dId,
+            name: `Desk ${dId}`
+          },
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
@@ -148,9 +166,18 @@ export class DeskAdminController {
         : [
           {
             id: Math.floor(200),
-            buildingId: bId,
-            roomId: rId,
-            deskId: dId,
+            room: {
+              id: rId,
+              name: `R&D Room`
+            },
+            building: {
+              id: bId,
+              name: `The Spire`
+            },
+            desk: {
+              id: rId,
+              name: `Desk ${rId}`
+            },
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
@@ -183,9 +210,18 @@ export class DeskAdminController {
       reservations: [
         {
           id: Math.floor(200),
-          buildingId: bId,
-          roomId: rId,
-          deskId: dId,
+          room: {
+            id: rId,
+            name: `R&D Room`
+          },
+          building: {
+            id: bId,
+            name: `The Spire`
+          },
+          desk: {
+            id: rId,
+            name: `Desk ${rId}`
+          },
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
@@ -199,7 +235,7 @@ export class DeskAdminController {
     };
   }
 
-  @Get("/:roomId/reservations")
+  @Get("/:deskId/reservations")
   @(Returns(200, Array).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get 🔍 detailed reservations of a 🔑-identified desk")
@@ -208,6 +244,7 @@ export class DeskAdminController {
     bId: number,
     @PathParams("roomId")
     rId: number,
+    @PathParams("deskId") dId: number,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -219,10 +256,19 @@ export class DeskAdminController {
     const json: Array<Reservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        deskId: undefined,
+        id: Math.floor(200),
+        room: {
+          id: rId,
+          name: `R&D Room`
+        },
+        building: {
+          id: bId,
+          name: `The Spire`
+        },
+        desk: {
+          id: rId,
+          name: `Desk ${rId}`
+        },
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {
