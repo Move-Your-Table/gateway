@@ -11,7 +11,7 @@ export default class DeskConstructor {
 
     @Property()
     @Required()
-    features: string;
+    features: Array<string>;
 
     @Property()
     @Minimum(1)
