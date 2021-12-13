@@ -33,7 +33,11 @@ export class DeskAdminController {
         name: `Dual Desk ${i}`,
         type: `Dual Desk`,
         incidents: i,
-        features: `<p>A double-sized desks, perfect for sharing with 2 coworkers!</p><ul><li>${i} desk lamps</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+        features: [
+          `${i} desk lamps`,
+          `Excellent WI-Fi Access`,
+          `LAN ports through FireWire`
+        ],
         capacity: i,
         floor: i,
         reservations: [
@@ -82,7 +86,11 @@ export class DeskAdminController {
       name: `Dual Desk ${dId}`,
       type: `Dual Desk`,
       incidents: dId,
-      features: `<p>A double-sized desks, perfect for sharing with 2 coworkers!</p><ul><li>${dId} desk lamps</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      features: [
+        `${dId} desk lamps`,
+        `Excellent WI-Fi Access`,
+        `LAN ports through FireWire`
+      ],
       capacity: dId,
       floor: dId,
       reservations: [
@@ -128,7 +136,7 @@ export class DeskAdminController {
       buildingId: bId,
       roomId: rId,
       name: payload.name,
-      type: payload.features,
+      type: payload.type,
       incidents: 0,
       features: payload.features,
       capacity: payload.capacity,
@@ -204,7 +212,11 @@ export class DeskAdminController {
       name: `Dual Desk ${dId}`,
       type: `Dual Desk`,
       incidents: dId,
-      features: `<p>A double-sized desks, perfect for sharing with 2 coworkers!</p><ul><li>${dId} desk lamps</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      features: [
+        `${dId} desk lamps`,
+        `Excellent WI-Fi Access`,
+        `LAN ports through FireWire`
+      ],
       capacity: dId,
       floor: dId,
       reservations: [
