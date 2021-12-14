@@ -1,9 +1,9 @@
 import { GraphQLClient, RequestDocument } from 'graphql-request'
 
-export class GraphQLService {
-    client = new GraphQLClient(process.env.GRAPHQL_ENDPOINT || "");
+const client = new GraphQLClient(process.env.GRAPHQL_ENDPOINT || "");
 
-    async request(query : RequestDocument, variables : Object = {}) {
-        return await this.client.request(query, variables);
+export default class GraphQLService {
+    static async request(query : RequestDocument, variables : Object = {}) : Promise<any> {
+        return await client.request(query, variables);
     }
 }
