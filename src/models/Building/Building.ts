@@ -26,9 +26,9 @@ export default class Building extends BuildingConstructor {
   @Minimum(0)
   id: number;
 
-  @Property(Rooms)
-  rooms: Rooms;
+  // @Property(Rooms)
+  // rooms: Rooms;
 
-  @Property(Desks)
-  desks: Desks;
+  // @Property(Desks)
+  // desks: Desks;
 }

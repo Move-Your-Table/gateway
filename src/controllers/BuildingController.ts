@@ -2,6 +2,8 @@ import { Controller } from "@tsed/di";
 import { PathParams } from "@tsed/platform-params";
 import { Get, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
+import { gql } from "graphql-request";
+import GraphQLService from "../services/GraphQlService";
 import Building from "../models/Building/Building";
 
 @Controller("/buildings")
@@ -11,28 +13,34 @@ export class BuildingController {
   @Get()
   @Summary("Get all buildings")
   @(Returns(200, Array).Of(Building))
-  findAll(): Array<Building> {
-    const json: Array<Building> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        name: `Building Name ${i}`,
-        street: `Street Name ${i}`,
-        city: `City ${i}`,
-        country: "Belgium",
-        postcode: "9000E",
-        rooms: {
-          total: 100 + i,
-          free: 50 + i
-        },
-        desks: {
-          total: 100 + i,
-          free: 50 + i
+  async findAll(): Promise<Array<Building>> {
+    const query = gql`
+    query {
+      buildings {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
         }
-      };
-      json.push(element);
+      }
     }
-    return json;
+    `
+
+    const result = await GraphQLService.request(query);
+    const buildings = result.buildings as Array<any>;
+    return buildings.map(building => {
+      return {
+        street: building.address.street,
+        city: building.address.city,
+        postcode: building.address.postalcode,
+        country: building.address.country,
+        name: building.name,
+        id: building._id
+      }
+    });
   }
 
   @Get("/:id")
@@ -46,15 +54,7 @@ export class BuildingController {
       street: `Spire Street ${id}`,
       city: `City ${id}`,
       postcode: "9000",
-      country: "Belgium",
-      rooms: {
-        total: 100,
-        free: 50
-      },
-      desks: {
-        total: 100,
-        free: 50
-      }
+      country: "Belgium"
     };
   }
 }
