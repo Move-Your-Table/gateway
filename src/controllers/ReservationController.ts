@@ -28,7 +28,7 @@ export class ReservationController {
         },
         desk: {
           id: i + 4,
-          name: `room ${i + 4}`
+          name: `desk ${i + 4}`
         },
         startTime: new Date(),
         endTime: new Date(),
