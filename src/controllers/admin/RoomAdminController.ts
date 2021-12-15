@@ -49,6 +49,7 @@ export class RoomAdminController {
           name
           type
           floor
+          features
         }
       }
     `
@@ -77,46 +78,39 @@ export class RoomAdminController {
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   @Summary("Edit a 🔑-identified room 🥽")
-  EditRoom(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @QueryParams("clearIncidents") iClear: boolean,
-    @QueryParams("clearReservations") rClear: boolean,
+  async EditRoom(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
     @BodyParams() payload: RoomMutator
-  ): Room<Reservation> {
+  ): Promise<RoomConstructor> {
+    const query = gql`
+      mutation updateRoom($id: String!, $roomName: String!, $roomInput: RoomUpdateInput!) {
+        updateRoom(buildingId: $id, 
+          roomName: $roomName,
+          roomInput: $roomInput) {
+            name
+            type
+            floor
+            features
+        }
+      }
+    `
+
+    const roomInput = {
+      name: payload.name,
+      type: payload.type,
+      floor: payload.floor,
+      features: payload.features,
+    }
+
+    const result = await GraphQLService.request(query, {id:bId, roomName: rId, roomInput: roomInput});
+    const room = result.updateRoom as any;
     return {
-      id: rId,
-      buildingId: bId,
-      name: payload.name || "Unchanged Building Name",
-      type: payload.type || "Unchanged type",
-      incidents: iClear ? 0 : 10,
-      features: payload.features || "Unchanged features",
-      capacity: payload.capacity || 10,
-      floor: payload.floor || 1,
-      reservations: rClear
-        ? []
-        : [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: undefined,
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
+      name: room.name,
+      type: room.type,
+      floor: room.floor,
+      features: room.features,
+      capacity: 0
     };
   }
 
