@@ -107,22 +107,32 @@ export class BuildingAdminController {
   @Returns(200, Building)
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  DeleteBuilding(@PathParams("id") id: number) {
+  async DeleteBuilding(@PathParams("id") id: string) {
+    const query = gql`
+    mutation deleteBuilding($id:String!) {
+      deleteBuilding(id:$id)
+     {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
+        }
+     }
+    }
+    `
+
+    const result = await GraphQLService.request(query, {id: id});
+    const building = result.deleteBuilding as any;
     return {
-      id: id,
-      name: `The Spire ${id}`,
-      street: `Spire Street ${id}`,
-      city: `City ${id}`,
-      postcode: "9000",
-      country: "Belgium",
-      rooms: {
-        total: 100,
-        free: 50
-      },
-      desks: {
-        total: 100,
-        free: 50
-      }
-    };
+      street: building.address.street,
+      city: building.address.city,
+      postcode: building.address.postalcode,
+      country: building.address.country,
+      name: building.name,
+      id: building._id
+    }
   }
 }
