@@ -5,6 +5,7 @@ import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import Building from "../models/Building/Building";
+import BuildingMapper from "src/models/Building/BuildingMapper";
 
 @Controller("/buildings")
 @Tags("Buildings")
@@ -31,16 +32,7 @@ export class BuildingController {
 
     const result = await GraphQLService.request(query);
     const buildings = result.buildings as Array<any>;
-    return buildings.map(building => {
-      return {
-        street: building.address.street,
-        city: building.address.city,
-        postcode: building.address.postalcode,
-        country: building.address.country,
-        name: building.name,
-        id: building._id
-      }
-    });
+    return buildings.map(BuildingMapper.mapBuilding);
   }
 
   @Get("/:id")
@@ -64,13 +56,6 @@ export class BuildingController {
     `
     const result = await GraphQLService.request(query, {id: id});
     const building = result.building as any;
-    return {
-      street: building.address.street,
-      city: building.address.city,
-      postcode: building.address.postalcode,
-      country: building.address.country,
-      name: building.name,
-      id: building._id
-    }
+    return BuildingMapper.mapBuilding(building);
   }
 }

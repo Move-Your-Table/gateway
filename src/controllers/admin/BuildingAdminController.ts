@@ -7,6 +7,7 @@ import GraphQLService from "../../services/GraphQlService";
 import Building from "../../models/Building/Building";
 import BuildingConstructor from "../../models/Building/BuildingConstructor";
 import BuildingMutator from "../../models/Building/BuildingMutator";
+import BuildingMapper from "../../models/Building/BuildingMapper";
 
 @Controller("/admin/building")
 @Tags("Buildings")
@@ -92,14 +93,7 @@ export class BuildingAdminController {
 
     const result = await GraphQLService.request(query, {id: id, buildingInput: buildingInput});
     const building = result.updateBuilding as any;
-    return {
-      street: building.address.street,
-      city: building.address.city,
-      postcode: building.address.postalcode,
-      country: building.address.country,
-      name: building.name,
-      id: building._id
-    }
+    return BuildingMapper.mapBuilding(building);
   }
 
   @Delete("/:id")
@@ -126,13 +120,6 @@ export class BuildingAdminController {
 
     const result = await GraphQLService.request(query, {id: id});
     const building = result.deleteBuilding as any;
-    return {
-      street: building.address.street,
-      city: building.address.city,
-      postcode: building.address.postalcode,
-      country: building.address.country,
-      name: building.name,
-      id: building._id
-    }
+    return BuildingMapper.mapBuilding(building);
   }
 }
