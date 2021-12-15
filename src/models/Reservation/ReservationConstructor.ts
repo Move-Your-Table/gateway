@@ -4,21 +4,21 @@ export default class ReservationConstructor {
     @Property()
     @Required()
     @Minimum(0)
-    userId: number;
+    userId: string;
 
     @Property()
     @Required()
     @Minimum(0)
-    buildingId: number;
+    buildingId: string;
 
     @Property()
     @Required()
     @Minimum(0)
-    roomId: number;
+    roomId: string;
 
     @Property()
     @Minimum(0)
-    deskId?: number;
+    deskId?: string;
 
     @Property()
     @Required()
