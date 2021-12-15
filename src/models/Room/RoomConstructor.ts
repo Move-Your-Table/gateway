@@ -11,7 +11,7 @@ export default class RoomConstructor {
 
   @Property()
   @Required()
-  features: string;
+  features: [string];
 
   @Property()
   @Minimum(1)
