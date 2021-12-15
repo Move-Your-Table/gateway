@@ -1,6 +1,12 @@
 import { Minimum, Property, Required } from "@tsed/schema";
 
 export default class ReservationConstructor {
+    
+    @Property()
+    @Required()
+    @Minimum(0)
+    userId: number;
+    
     @Property()
     @Minimum(0)
     buildingId: number;

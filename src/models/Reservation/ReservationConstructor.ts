@@ -4,6 +4,11 @@ export default class ReservationConstructor {
     @Property()
     @Required()
     @Minimum(0)
+    userId: number;
+
+    @Property()
+    @Required()
+    @Minimum(0)
     buildingId: number;
 
     @Property()

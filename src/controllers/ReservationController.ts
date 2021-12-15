@@ -5,6 +5,8 @@ import { Docs } from "@tsed/swagger";
 import Reservation from "../models/Reservation/Reservation";
 import ReservationConstructor from "../models/Reservation/ReservationConstructor";
 import ReservationMutator from "../models/Reservation/ReservationMutator";
+import { gql } from "graphql-request";
+import GraphQLService from "src/services/GraphQlService";
 
 @Controller("/reservations")
 @Docs("admin-api", "general-api")
@@ -45,38 +47,56 @@ export class ReservationController {
   }
 
   @Post("/")
-  @Summary("Make a reservation for a 🔑-identified desk/room")
-  @Description("- When the desk-Id is undefined, null or not given, the room will be reserved. \n - For date, you can use a ECMAScript Date object and parse this to a string, we'll handle the rest.")
+  @Summary("Make a reservation for a 🔑-identified desk")
+  @Description("- For date, you can use a ECMAScript Date object and parse this to a string, we'll handle the rest.")
   @Returns(200, Reservation)
   @Returns(400).Description("Bad Request")
   @Returns(404).Description("Not Found")
-  createReservation(@BodyParams() payload: ReservationConstructor): Reservation {
-    return {
-      id: Math.floor(200),
-      building: {
-        id: payload.buildingId,
-        name: `building ${payload.buildingId}`
-      },
-      room: {
-        id: payload.roomId,
-        name: `room ${payload.roomId}`
-      },
-      desk: (payload.deskId)
-        ? {
-          id: payload.deskId,
-          name: `desk ${payload.deskId}`
+  async CreateReservation(@BodyParams() payload: ReservationMutator): Promise<ReservationConstructor> {
+    console.log("aaa");
+    const query = gql`
+      mutation addBookingToDesk($id: String!, $roomName: String!, $deskName: String!, $bookingInput: BookingInput!) {
+        addBookingToDesk(
+          buildingId: $id,
+          roomName: $roomName,
+          deskName: $deskName,
+          bookingInput: $bookingInput) 
+        {
+          _id
+          user {
+            _id
+            first_name
+            last_name
+            company
+          }
+          start_time
+          end_time 
         }
-        : undefined,
-      startTime: new Date(),
-      endTime: new Date(),
-      reserved_for: {
-        id: 1,
-        first_name: "JJ",
-        last_name: "Johnson",
-        company: "NB Electronics"
       }
+    `
+    console.log(query);
+
+    const bookingInput = {
+      user_id: payload.userId,
+      start_time: payload.startTime,
+      end_time: payload.endTime,
+      public: true,
     }
+    console.log(bookingInput);
+    const result = await GraphQLService.request(query, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingInput: bookingInput});
+    const reservation = result.addBookingToDesk as any;
+    console.log(reservation);
+    return {
+      userId: reservation.user_id,
+      buildingId: reservation.buildingId,
+      startTime: reservation.start_time,
+      endTime: reservation.end_time,
+      roomId: reservation.roomId
+    };
   }
+
+
+
 
   @Patch("/:reservationId")
   @Summary("Edit a 🔑-identified reservation 🥽")
