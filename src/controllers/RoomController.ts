@@ -57,7 +57,7 @@ export class RoomController {
 
     const result = await GraphQLService.request(query, {id: id, name: name});
     const building = result.building as any;
-    return RoomMapper.mapRoomsWithMaskedReservations(building);
+    return RoomMapper.mapRooms(building);
     }
   
 
@@ -65,33 +65,48 @@ export class RoomController {
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
-  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<MaskedReservation> {
-    return {
-      id: rId,
-      buildingId: bId,
-      name: `R&D Room ${rId}`,
-      type: `R&D Room`,
-      incidents: Math.floor(10),
-      features: ["Yeet"],
-      capacity: rId,
-      floor: rId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: undefined,
-          startTime: new Date(),
-          endTime: new Date()
+  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string): Promise<Room<MaskedReservation>|null> {
+    const query = gql`
+    query getRooms($id:String!, $name: String) {
+      building(id:$id) {
+        _id
+        name
+        rooms(name:$name) {
+          name
+          type
+          features
+          floor
+          incidentReports {
+            _id
+          }
+          desks {
+            name
+            bookings {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
+          }
         }
-      ]
-    };
+      }
+    }
+    `
+
+    const result = await GraphQLService.request(query, {id: bId, name: rId});
+    const building = result.building as any;
+    const rooms = RoomMapper.mapRooms(building);
+
+    if(rooms.length === 0) {
+      return null;
+    } else {
+      return rooms[0];
+    }
   }
 
   @Get("/:roomId/reservations")
