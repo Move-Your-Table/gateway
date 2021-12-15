@@ -62,23 +62,44 @@ export class BuildingAdminController {
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   @Summary("Edits a building 🥽")
-  EditBuilding(@PathParams("id") id: number, @BodyParams() payload: BuildingMutator) {
-    return {
-      id: id,
-      name: payload.name || "Unchanged Building Name",
-      street: payload.street || "Unchanged Street Name",
-      city: payload.city || "Unchanged City",
-      postcode: payload.postcode || "Unchanged Code",
-      country: payload.country || "Unchanged Country",
-      rooms: {
-        total: Math.floor(200),
-        free: Math.floor(200)
-      },
-      desks: {
-        total: Math.floor(200),
-        free: Math.floor(200)
+  async EditBuilding(@PathParams("id") id: string, @BodyParams() payload: BuildingMutator) {
+    const query = gql`
+    mutation updateBuilding($id:String!, $buildingInput:BuildingUpdateInput!) {
+      updateBuilding(id:$id,
+        buildingInput: $buildingInput)
+     {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
+        }
+     }
+    }
+    `
+
+    const buildingInput = {
+      name: payload.name,
+      address: {
+        country: payload.country,
+        postalcode: payload.postcode,
+        city: payload.city,
+        street: payload.street
       }
     };
+
+    const result = await GraphQLService.request(query, {id: id, buildingInput: buildingInput});
+    const building = result.updateBuilding as any;
+    return {
+      street: building.address.street,
+      city: building.address.city,
+      postcode: building.address.postalcode,
+      country: building.address.country,
+      name: building.name,
+      id: building._id
+    }
   }
 
   @Delete("/:id")
