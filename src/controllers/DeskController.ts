@@ -1,12 +1,14 @@
 import { PathParams, QueryParams } from "@tsed/common";
-import {Controller} from "@tsed/di";
+import { Controller } from "@tsed/di";
 import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
+import { gql } from "graphql-request";
+import GraphQLService from "../services/GraphQlService";
 
-@Controller("/building/:buildingId/room/:roomId/desks")
+@Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
 @Tags("Desks")
 export class DeskController {
@@ -14,19 +16,41 @@ export class DeskController {
   @Summary("Get all desks with reservations")
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
-  findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
+  async findAll(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomName") rId: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Desk<MaskedReservation>> {
+  ): Promise<Array<Desk<MaskedReservation>>> {
+    const query = gql`
+    query{
+      building(id: "61b9ee2068ded859109fdc82"){
+        name,
+        rooms(name: "Room 1"){
+          name,
+          desks{
+            name,
+            incidentReports{_id},
+            bookings{
+              _id,
+              start_time,
+              end_time,
+            }
+          }
+        }
+      }
+    }`
+    GraphQLService.request(query)
+      .then((response) => { 
+        const results = response as Array<any>
+      })
     const json: Array<Desk<MaskedReservation>> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
         id: i,
         buildingId: bId,
-        roomId: rId,
+        roomName: rId,
         name: `Dual Desk ${i}`,
         type: `Dual Desk`,
         incidents: i,
@@ -69,11 +93,11 @@ export class DeskController {
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
+  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomName") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
     return {
       id: dId,
       buildingId: bId,
-      roomId: rId,
+      roomName: rId,
       name: `Dual Desk ${dId}`,
       type: `Dual Desk`,
       incidents: dId,
@@ -113,7 +137,7 @@ export class DeskController {
   getReservationsPerRoom(
     @PathParams("buildingId")
     bId: number,
-    @PathParams("roomId")
+    @PathParams("roomName")
     rId: number,
     @PathParams("deskId")
     dId: number,
