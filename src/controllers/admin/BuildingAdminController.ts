@@ -2,6 +2,8 @@ import { Controller } from "@tsed/di";
 import { BodyParams, PathParams } from "@tsed/platform-params";
 import { Delete, Patch, Post, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
+import { gql } from "graphql-request";
+import GraphQLService from "../../services/GraphQlService";
 import Building from "../../models/Building/Building";
 import BuildingConstructor from "../../models/Building/BuildingConstructor";
 import BuildingMutator from "../../models/Building/BuildingMutator";
@@ -15,19 +17,43 @@ export class BuildingAdminController {
   @Returns(201, Building)
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateBuilding(@BodyParams() payload: BuildingConstructor) {
-    return {
-      id: 22,
-      ...payload,
-      rooms: {
-        total: 0,
-        free: 0
-      },
-      desks: {
-        total: 0,
-        free: 0
+  async CreateBuilding(@BodyParams() payload: BuildingConstructor) {
+    const query = gql`
+    mutation addBuilding($buildingInput: BuildingInput!) {
+      addBuilding(buildingInput: $buildingInput)
+     {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
+        }
+     }
+    }
+    `
+
+    const buildingInput = {
+      name: payload.name,
+      address: {
+        country: payload.country,
+        postalcode: payload.postcode,
+        city: payload.city,
+        street: payload.street
       }
-    };
+    }
+
+    const result = await GraphQLService.request(query, {buildingInput: buildingInput});
+    const building = result.addBuilding as any;
+    return {
+      street: building.address.street,
+      city: building.address.city,
+      postcode: building.address.postalcode,
+      country: building.address.country,
+      name: building.name,
+      id: building._id
+    }
   }
 
   @Patch("/:id")
