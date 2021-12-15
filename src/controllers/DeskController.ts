@@ -7,6 +7,7 @@ import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
+import DeskMapper from "../models/Desks/DeskMapper";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -27,6 +28,7 @@ export class DeskController {
     query{
       building(id: "61b9ee2068ded859109fdc82"){
         name,
+        _id
         rooms(name: "Room 1"){
           name,
           desks{
@@ -41,52 +43,19 @@ export class DeskController {
         }
       }
     }`
-    GraphQLService.request(query)
+    return GraphQLService.request(query)
       .then((response) => { 
-        const results = response as Array<any>
+        return response.building.rooms[0].desks
+          .map(
+            (desk: Array<any>) => DeskMapper.mapDesk(bId, rId, desk)
+          )
       })
-    const json: Array<Desk<MaskedReservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: bId,
-        roomName: rId,
-        name: `Dual Desk ${i}`,
-        type: `Dual Desk`,
-        incidents: i,
-        features: [
-          `${i} desk lamps`,
-          `Excellent WI-Fi Access`,
-          `LAN ports through FireWire`
-        ],
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: i,
-              name: `Desk ${i}`
-            },
-            startTime: new Date(),
-            endTime: new Date()
-          }
-        ]
-      };
-      json.push(element);
-    }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
+      .then((response: Array<Desk<MaskedReservation>>) => { 
+        return response.filter((room) => room.name.includes(name || ""))
+          .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
+          .filter((room) => room.type.includes(type || ""));
+      })
+      
   }
 
   @Get("/:deskId")

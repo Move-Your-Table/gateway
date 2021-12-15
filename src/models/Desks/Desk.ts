@@ -7,17 +7,17 @@ export default class Desk<T> extends DeskConstructor{
     @Property()
     @Required()
     @Minimum(0)
-    id: number;
+    id: string;
 
     @Property()
     @Required()
     @Minimum(0)
-    buildingId: number;
+    buildingId: string;
 
     @Property()
     @Required()
     @Minimum(0)
-    roomId: number;
+    roomId: string;
 
     @Property()
     @Minimum(0)
