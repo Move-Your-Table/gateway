@@ -14,12 +14,12 @@ MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.i
    ```
 2. Run npm install:
    ```bash
-   $ npm install
+   $ yarn install
    ```
 3. Copy the `.env.example` file, rename it to `.env` and fill it in according to the [`.env` configuration section](#env-configuration-file)
 4. Now, run the following command:
    ```bash
-   $ npm run start:container
+   $ yarn run start:container
    ```
    > ⏱ This will take a while the first time. Go grab a ☕ while waiting.
 
@@ -40,11 +40,11 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 ## Available commands
 |Command|Explication|
 |---|---|
-|`npm run start`|Starts a development server **locally**|
-|`npm run start:prod`|Starts a production-ready server **locally**|
+|`yarn start`|Starts a development server **locally**|
+|`yarn start:prod`|Starts a production-ready server **locally**|
 |||
-|`npm run start:container`|Start a fully **containerized** development server **with** hot-reloading capabilities.|
-|`npm run start:container:prod`|Start a fully **containerized** production server|
+|`yarn start:container`|Start a fully **containerized** development server **with** hot-reloading capabilities.|
+|`yarn start:container:prod`|Start a fully **containerized** production server|
   
 
 # Miscellaneous

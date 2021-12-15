@@ -6,7 +6,7 @@ RUN apt update --quiet
 RUN apt-get install git python3 --quiet
 
 COPY . .
-RUN yarn install --quiet
+RUN yarn install --quiet --fresh
 RUN yarn build
 
 # Run the application

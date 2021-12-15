@@ -8,7 +8,7 @@ COPY yarn.lock .
 COPY ./src ./src
 COPY ./views ./views
 
-RUN yarn install
+RUN yarn install --quiet
 
 EXPOSE 8081
 ENV PORT 8081
