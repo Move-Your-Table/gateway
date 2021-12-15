@@ -9,6 +9,8 @@ import Room from "../../models/Room/Room";
 import RoomConstructor from "../../models/Room/RoomConstructor";
 import RoomMutator from "../../models/Room/RoomMutator";
 import { RoomController } from "../RoomController";
+import { gql } from "graphql-request";
+import GraphQLService from "src/services/GraphQlService";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
@@ -40,17 +42,32 @@ export class RoomAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @Summary("Create a new room 🎊")
-  CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: number,): Room<Reservation> {
-    return {
-      id: 22,
-      buildingId: id,
+  async CreateRoom(@BodyParams() payload: RoomConstructor, @PathParams("buildingId") id: string): Promise<RoomConstructor> {
+    const query = gql`
+      mutation addRoom($id: String!, $roomInput: RoomInput!) {
+        addRoom(buildingId: $id, roomInput: $roomInput) {
+          name
+          type
+          floor
+        }
+      }
+    `
+
+    const roomInput = {
       name: payload.name,
-      type: "normal",
-      incidents: 0,
-      features: payload.features,
-      capacity: payload.capacity,
+      type: payload.type,
       floor: payload.floor,
-      reservations: []
+      features: payload.features,
+    }
+
+    const result = await GraphQLService.request(query, {id:id, roomInput: roomInput});
+    const room = result.addRoom as any;
+    return {
+      name: room.name,
+      type: room.type,
+      floor: room.floor,
+      features: room.features,
+      capacity: 0
     };
   }
 

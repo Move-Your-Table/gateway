@@ -1,4 +1,4 @@
-import { Property, Required, Minimum } from "@tsed/schema";
+import { Property, Required, Minimum, Example } from "@tsed/schema";
 
 export default class RoomConstructor {
   @Property()
@@ -11,7 +11,8 @@ export default class RoomConstructor {
 
   @Property()
   @Required()
-  features: [string];
+  @Example(["Fridge"])
+  features: Array<String>;
 
   @Property()
   @Minimum(1)
