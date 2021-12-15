@@ -4,7 +4,7 @@ import Room from "./Room";
 
 export default class RoomMapper {
     // Map GraphQL room to the correct format for the API
-    static mapRooms(building : any, detailedReservations=false) : Array<Room<MaskedReservation>> {
+    static mapRooms(building : any, detailedReservations : Boolean = false) : Array<Room<MaskedReservation>> {
         const rooms = Array<Room<MaskedReservation | Reservation>>();
 
         building.rooms.forEach((room : any) => {
@@ -38,14 +38,17 @@ export default class RoomMapper {
                         },
                         id: booking._id,
                         startTime: booking.start_time,
-                        endTime: booking.end_time,
-                        reserved_for: {
+                        endTime: booking.end_time
+                    };
+
+                    if(detailedReservations) {
+                        (reservation as any).reserved_for = {
                             id: booking.user._id,
                             first_name: booking.user.first_name,
                             last_name: booking.user.last_name,
-                            company: booking.user.company
+                            company: booking.user.company,
                         }
-                    };
+                    }
 
                     mappedRoom.reservations.push(reservation);
                 });

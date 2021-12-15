@@ -2,11 +2,13 @@ import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
+import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import { fullDateCheck } from "../../helpers/date";
 import Reservation from "../../models/Reservation/Reservation";
 import Room from "../../models/Room/Room";
 import RoomConstructor from "../../models/Room/RoomConstructor";
 import RoomMutator from "../../models/Room/RoomMutator";
+import { RoomController } from "../RoomController";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
@@ -16,92 +18,21 @@ export class RoomAdminController {
   @Summary("Get all rooms with 🔍 detailed reservations")
   @(Returns(404).Description("Not Found"))
   @(Returns(200, Array).Of(Room).Description("OK"))
-  findAll(
-    @PathParams("buildingId") id: number,
+  async findAll(
+    @PathParams("buildingId") id: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Room<Reservation>> {
-    const json: Array<Room<Reservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: id,
-        name: `R&D Room ${i}`,
-        type: `R&D Room`,
-        incidents: i,
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i
-          } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: i,
-              name: `R&D Room`
-            },
-            building: {
-              id: id,
-              name: `The Spire`
-            },
-            desk: undefined,
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
-      };
-      json.push(element);
-    }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
+  ): Promise<Array<Room<MaskedReservation|Reservation>>> {
+   return await RoomController.getRooms(id, true, name);
   }
 
   @Get("/:roomId")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
-  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
-    return {
-      id: rId,
-      buildingId: bId,
-      name: `R&D Room ${rId}`,
-      type: `R&D Room`,
-      incidents: Math.floor(10),
-      features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
-      capacity: bId,
-      floor: bId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: undefined,
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: 1,
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
-          }
-        }
-      ]
-    };
+  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string): Promise<Array<Room<MaskedReservation|Reservation>>> {
+    return await RoomController.getRooms(bId, true, rId);
   }
 
   @Post()
@@ -114,7 +45,7 @@ export class RoomAdminController {
       id: 22,
       buildingId: id,
       name: payload.name,
-      type: payload.features,
+      type: "normal",
       incidents: 0,
       features: payload.features,
       capacity: payload.capacity,
@@ -184,7 +115,7 @@ export class RoomAdminController {
       name: `R&D Room ${rId}`,
       type: `R&D Room`,
       incidents: Math.floor(10),
-      features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
+      features: ["yeet"],
       capacity: bId,
       floor: bId,
       reservations: [

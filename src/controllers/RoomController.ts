@@ -8,6 +8,7 @@ import GraphQLService from "src/services/GraphQlService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
 import { fullDateCheck } from "src/helpers/date";
+import Reservation from "src/models/Reservation/Reservation";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")
@@ -23,41 +24,7 @@ export class RoomController {
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation>>> {
-    const query = gql`
-    query getRooms($id:String!, $name: String) {
-      building(id:$id) {
-        _id
-        name
-        rooms(name:$name) {
-          name
-          type
-          features
-          floor
-          incidentReports {
-            _id
-          }
-          desks {
-            name
-            bookings {
-              _id
-              start_time
-              end_time
-              user {
-                _id
-                first_name
-                last_name
-                company
-              }
-            }
-          }
-        }
-      }
-    }
-    `
-
-    const result = await GraphQLService.request(query, {id: id, name: name});
-    const building = result.building as any;
-    return RoomMapper.mapRooms(building);
+      return await RoomController.getRooms(id, false, name);
     }
   
 
@@ -66,41 +33,7 @@ export class RoomController {
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
   async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string): Promise<Room<MaskedReservation>|null> {
-    const query = gql`
-    query getRooms($id:String!, $name: String) {
-      building(id:$id) {
-        _id
-        name
-        rooms(name:$name) {
-          name
-          type
-          features
-          floor
-          incidentReports {
-            _id
-          }
-          desks {
-            name
-            bookings {
-              _id
-              start_time
-              end_time
-              user {
-                _id
-                first_name
-                last_name
-                company
-              }
-            }
-          }
-        }
-      }
-    }
-    `
-
-    const result = await GraphQLService.request(query, {id: bId, name: rId});
-    const building = result.building as any;
-    const rooms = RoomMapper.mapRooms(building);
+    const rooms = await RoomController.getRooms(bId, false, rId);
 
     if(rooms.length === 0) {
       return null;
@@ -145,6 +78,44 @@ export class RoomController {
       json.push(element);
     };
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+  }
+
+  static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
+    const query = gql`
+    query getRooms($id:String!, $name: String) {
+      building(id:$id) {
+        _id
+        name
+        rooms(name:$name) {
+          name
+          type
+          features
+          floor
+          incidentReports {
+            _id
+          }
+          desks {
+            name
+            bookings {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
+          }
+        }
+      }
+    }
+    `
+
+    const result = await GraphQLService.request(query, {id: buildingId, name: roomName});
+    const building = result.building as any;
+    return RoomMapper.mapRooms(building, detailedReservations);
   }
 }
 
