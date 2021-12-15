@@ -1,10 +1,14 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
-import { Description, Example, Format, Get, Name, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "../helpers/date";
+import { gql } from "graphql-request";
+import RoomMapper from "../models/Room/RoomMapper";
+import GraphQLService from "src/services/GraphQlService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
+import { fullDateCheck } from "src/helpers/date";
+import Reservation from "src/models/Reservation/Reservation";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")
@@ -14,80 +18,28 @@ export class RoomController {
   @Summary("Get all rooms with 🎭 reservations.")
   @(Returns(200, Array).Of(Room).Description("OK"))
   @(Returns(404).Description("Not Found"))
-  findAll(
-    @PathParams("buildingId") id: number,
+  async findAll(
+    @PathParams("buildingId") id: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Room<MaskedReservation>> {
-    const json: Array<Room<MaskedReservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: id,
-        name: `R&D Room ${i}`,
-        type: `R&D Room`,
-        incidents: i,
-        features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>${i} workbenches</li><li>${5 + i
-          } PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: i,
-              name: `R&D Room`
-            },
-            building: {
-              id: id,
-              name: `The Spire`
-            },
-            desk: undefined,
-            startTime: new Date(),
-            endTime: new Date()
-          }
-        ]
-      };
-      json.push(element);
+  ): Promise<Array<Room<MaskedReservation>>> {
+      return await RoomController.getRooms(id, false, name);
     }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
-  }
+  
 
   @Get("/:roomId")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
-  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<MaskedReservation> {
-    return {
-      id: rId,
-      buildingId: bId,
-      name: `R&D Room ${rId}`,
-      type: `R&D Room`,
-      incidents: Math.floor(10),
-      features: `<p>A fully-fledged R&D rooms that contains the following features:</p><ul><li>5 workbenches</li><li>3 PCs</li><li>Excellent WI-Fi Access</li><li>LAN ports through FireWire</li></ul>`,
-      capacity: rId,
-      floor: rId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: undefined,
-          startTime: new Date(),
-          endTime: new Date()
-        }
-      ]
-    };
+  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string): Promise<Room<MaskedReservation>|null> {
+    const rooms = await RoomController.getRooms(bId, false, rId);
+
+    if(rooms.length === 0) {
+      return null;
+    } else {
+      return rooms[0];
+    }
   }
 
   @Get("/:roomId/reservations")
@@ -126,6 +78,44 @@ export class RoomController {
       json.push(element);
     };
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+  }
+
+  static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
+    const query = gql`
+    query getRooms($id:String!, $name: String) {
+      building(id:$id) {
+        _id
+        name
+        rooms(name:$name) {
+          name
+          type
+          features
+          floor
+          incidentReports {
+            _id
+          }
+          desks {
+            name
+            bookings {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
+          }
+        }
+      }
+    }
+    `
+
+    const result = await GraphQLService.request(query, {id: buildingId, name: roomName});
+    const building = result.building as any;
+    return RoomMapper.mapRooms(building, detailedReservations);
   }
 }
 

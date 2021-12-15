@@ -2,7 +2,7 @@ import Building from "./Building";
 
 export default class BuildingMapper {
     // Map GraphQL building to the correct format for the API
-    static mapBuilding(building : any) {
+    static mapBuilding(building : any) : Building {
         return {
             street: building.address.street,
             city: building.address.city,
@@ -10,7 +10,6 @@ export default class BuildingMapper {
             country: building.address.country,
             name: building.name,
             id: building._id,
-            name2: "Joe"
           }
     }
 }
