@@ -47,14 +47,30 @@ export class BuildingController {
   @Summary("Get 🔑-identified building")
   @Returns(200, Building)
   @(Returns(404).Description("Not Found"))
-  getById(@PathParams("id") id: number): Building {
+  async getById(@PathParams("id") id: string): Promise<Building> {
+    const query = gql`
+    query getSpecificBuilding($id: String!) {
+      building(id: $id) {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
+        }
+      }
+    }
+    `
+    const result = await GraphQLService.request(query, {id: id});
+    const building = result.building as any;
     return {
-      id: id,
-      name: `The Spire ${id}`,
-      street: `Spire Street ${id}`,
-      city: `City ${id}`,
-      postcode: "9000",
-      country: "Belgium"
-    };
+      street: building.address.street,
+      city: building.address.city,
+      postcode: building.address.postalcode,
+      country: building.address.country,
+      name: building.name,
+      id: building._id
+    }
   }
 }
