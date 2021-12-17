@@ -3,7 +3,7 @@ import { BodyParams, PathParams } from "@tsed/platform-params";
 import { Delete, Patch, Post, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
-import GraphQLService from "../../services/GraphQlService";
+import GraphQLService from "../../services/GraphQLService";
 import Building from "../../models/Building/Building";
 import BuildingConstructor from "../../models/Building/BuildingConstructor";
 import BuildingMutator from "../../models/Building/BuildingMutator";

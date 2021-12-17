@@ -6,7 +6,7 @@ import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import DeskMapper from "../models/Desks/DeskMapper";
 import Reservation from "../models/Reservation/Reservation";
-import GraphQLService from "../services/GraphQlService";
+import GraphQLService from "../services/GraphQLService";
 import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";

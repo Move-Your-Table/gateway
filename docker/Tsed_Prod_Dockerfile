@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt update --quiet
 RUN apt-get install git python3 --quiet
 
-COPY . .
+COPY . /app
 RUN yarn install --quiet
 RUN yarn build
 

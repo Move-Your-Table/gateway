@@ -10,7 +10,7 @@ import DeskMutator from "../../models/Desks/DeskMutator";
 import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import Reservation from "../../models/Reservation/Reservation";
 import { gql } from "graphql-request";
-import GraphQLService from "../../services/GraphQlService";
+import GraphQLService from "../../services/GraphQLService";
 
 @Controller("/admin/building/:buildingId/room/:roomName/desks")
 @Docs("admin-api")
