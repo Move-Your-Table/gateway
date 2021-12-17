@@ -1,11 +1,12 @@
 # MYT Gateway
 
-MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.io). This server will give you access to the microservices framework that is powering MYT.
+MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.io). This server will give you access to the microservice framework that is powering MYT.
 
 ## Getting started
 ### Requirements
 - [Docker (Desktop)](https://www.docker.com/get-started)
-- [Node](https://nodejs.org/en/) & NPM
+- [Node](https://nodejs.org/en/)
+- [Yarn](https://yarnpkg.com/)
 
 ### Development Setup
 1. Clone this project using the following command:
@@ -14,12 +15,12 @@ MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.i
    ```
 2. Run npm install:
    ```bash
-   $ npm install
+   $ yarn install
    ```
 3. Copy the `.env.example` file, rename it to `.env` and fill it in according to the [`.env` configuration section](#env-configuration-file)
 4. Now, run the following command:
    ```bash
-   $ npm run start:container
+   $ yarn start:container
    ```
    > ⏱ This will take a while the first time. Go grab a ☕ while waiting.
 
@@ -30,7 +31,7 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 
 - For [Back-End](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/back-end), clone the project, navigate to the root of the project and perform the following command:
   ```bash
-  $ npm run start:container:prod
+  $ yarn start:container:prod
   ```
 - For [Automation API](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/automateapi), clone the project, navigate to the root of the project and perform the following command:
   ```bash
@@ -40,11 +41,11 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 ## Available commands
 |Command|Explication|
 |---|---|
-|`npm run start`|Starts a development server **locally**|
-|`npm run start:prod`|Starts a production-ready server **locally**|
+|`yarn start`|Starts a development server **locally**|
+|`yarn start:prod`|Starts a production-ready server **locally**|
 |||
-|`npm run start:container`|Start a fully **containerized** development server **with** hot-reloading capabilities.|
-|`npm run start:container:prod`|Start a fully **containerized** production server|
+|`yarn start:container`|Start a fully **containerized** development server **with** hot-reloading capabilities.|
+|`yarn start:container:prod`|Start a fully **containerized** production server|
   
 
 # Miscellaneous
