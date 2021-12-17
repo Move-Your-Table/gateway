@@ -137,7 +137,7 @@ export class DeskAdminController {
       {buildingId:bId, roomName: roomName, deskName: deskName});
     const desk = result.removeDesk as any;
     return {
-      name: desk.name,
+      deskName: desk.name,
       features: desk.features,
       type: "normal",
       floor: 0,
