@@ -81,51 +81,37 @@ export class DeskAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  EditDesk(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @PathParams("deskId") dId: number,
+  async EditDesk(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @PathParams("deskId") dId: string,
     @QueryParams("clearIncidents") iClear: boolean,
     @QueryParams("clearReservations") rClear: boolean,
     @BodyParams() payload: DeskMutator
-  ): Desk<Reservation> {
+  ): Promise<DeskConstructor> {
+    const query = gql`
+      mutation updateDesk($buildingId:String!, $roomName:String!, $deskName:String!, $deskInput:DeskInput!) {
+        updateDesk(buildingId: $buildingId, roomName: $roomName, deskName: $deskName, deskInput: $deskInput) {
+          name
+          features
+        }
+      }
+    `
+
+    const deskInput = {
+      name: payload.name,
+      features: payload.features
+    }
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskName: dId, deskInput: deskInput});
+    const desk = result.updateDesk as any;
     return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: payload.name || "Unchanged Desk Name",
-      type: payload.type || "Unchanged type",
-      incidents: iClear ? 0 : 10,
-      features: payload.features || "Unchanged features",
-      capacity: payload.capacity || 10,
-      floor: payload.floor || 1,
-      reservations: rClear
-        ? []
-        : [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: rId,
-              name: `Desk ${rId}`
-            },
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 
