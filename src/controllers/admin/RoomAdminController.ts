@@ -57,7 +57,7 @@ export class RoomAdminController {
     `
 
     const roomInput = {
-      name: payload.name,
+      name: payload.roomName,
       type: payload.type,
       floor: payload.floor,
       features: payload.features,
@@ -66,7 +66,7 @@ export class RoomAdminController {
     const result = await GraphQLService.request(query, {id:id, roomInput: roomInput});
     const room = result.addRoom as any;
     return {
-      name: room.name,
+      roomName: room.name,
       type: room.type,
       floor: room.floor,
       features: room.features,
@@ -99,7 +99,7 @@ export class RoomAdminController {
     `
 
     const roomInput = {
-      name: payload.name,
+      name: payload.roomName,
       type: payload.type,
       floor: payload.floor,
       features: payload.features,
@@ -108,7 +108,7 @@ export class RoomAdminController {
     const result = await GraphQLService.request(query, {id:bId, roomName: roomName, roomInput: roomInput});
     const room = result.updateRoom as any;
     return {
-      name: room.name,
+      roomName: room.roomName,
       type: room.type,
       floor: room.floor,
       features: room.features,
@@ -125,7 +125,6 @@ export class RoomAdminController {
     return {
       roomName: roomName,
       buildingId: bId,
-      name: `R&D Room ${roomName}`,
       type: `R&D Room`,
       features: ["yeet"],
       capacity: 0,

@@ -62,7 +62,7 @@ export class DeskAdminController {
     `
 
     const deskInput = {
-      name: payload.name,
+      name: payload.deskName,
       features: payload.features
     }
 
@@ -70,7 +70,7 @@ export class DeskAdminController {
       {buildingId:bId, roomName: roomName, deskInput: deskInput});
     const desk = result.addDeskToRoom as any;
     return {
-      name: desk.name,
+      deskName: desk.name,
       features: desk.features,
       type: "normal",
       floor: 0,
@@ -102,7 +102,7 @@ export class DeskAdminController {
     `
 
     const deskInput = {
-      name: payload.name,
+      name: payload.deskName,
       features: payload.features
     }
 
@@ -110,7 +110,7 @@ export class DeskAdminController {
       {buildingId:bId, roomName: roomName, deskName: deskName, deskInput: deskInput});
     const desk = result.updateDesk as any;
     return {
-      name: desk.name,
+      deskName: desk.name,
       features: desk.features,
       type: "normal",
       floor: 0,
