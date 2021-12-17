@@ -8,7 +8,9 @@ import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import DeskMapper from "../models/Desks/DeskMapper";
 import { fullDateCheck } from "../helpers/date";
-import { NotFound } from "@tsed/exceptions";
+import { BadRequest, NotFound } from "@tsed/exceptions";
+import MaskedReservationMapper from "../models/Reservation/MaskedReservationMapper";
+import GraphQlErrorHandler from "../helpers/error/GraphQLErrorHandler";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -25,25 +27,7 @@ export class DeskController {
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Desk<MaskedReservation>>> {
-    const query = gql`
-    query{
-      building(id: "${bId}"){
-        name,
-        _id
-        rooms(name: "${rId}"){
-          name,
-          desks{
-            name,
-            incidentReports{_id},
-            bookings{
-              _id,
-              start_time,
-              end_time,
-            }
-          }
-        }
-      }
-    }`
+    const query = GraphQLQueries.allDesks(bId, rId)
     return GraphQLService.request(query)
       .then((response) => {
         GraphQLLogicHandler(response)
@@ -64,8 +48,91 @@ export class DeskController {
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
-    const query = gql`
+  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomName") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
+    const query = GraphQLQueries.OneDesk(bId, rId, dId)
+    return GraphQLService.request(query)
+      .then((response) => {
+        GraphQLLogicHandler(response)
+        const desk = response.building.rooms[0].desks[0]
+        return DeskMapper.mapDesk(bId, rId, desk)
+      })
+      .catch((err) => { 
+        return GraphQLErrorHandler(err)
+      })
+  }
+
+  @Get("/:deskId/reservations")
+  @Summary("Get 🎭 reservations of a 🔑-identified desk")
+  @(Returns(200, Array).Of(MaskedReservation))
+  @(Returns(404).Description("Not Found"))
+  async getReservationsPerRoom(
+    @PathParams("buildingId")
+    bId: string,
+    @PathParams("roomName")
+    rId: string,
+    @PathParams("deskId")
+    dId: string,
+    @QueryParams("day")
+    @Required()
+    @Example("yyyy-MM-dd")
+    @Format("regex")
+    day: string
+  ): Promise<Array<MaskedReservation>> {
+    const query = GraphQLQueries.OneDesk(bId, rId, dId)
+    const regex = RegExp("^(19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[012])-([123]0|[012][1-9]|31)$")
+    if (!regex.test(day)) { throw new BadRequest("The day parameter is not properly formatted.")}
+    return GraphQLService.request(query)
+      .then((response) => {
+        GraphQLLogicHandler(response)
+        const reservations: Array<any> = response.building.rooms[0].desks[0].bookings
+        return reservations
+          .map((reservation) => MaskedReservationMapper.mapReservation(bId, rId, dId, reservation, response.building.name))
+          .filter(reservation => fullDateCheck(reservation.startTime, new Date(day)))
+      })
+      .catch((err) => { 
+        return GraphQLErrorHandler(err)
+      })
+  }
+}
+
+/* Because GraphQL error message are inconsistent, Errors need to be judge on a case-by-case method */ 
+function GraphQLErrorHandler(err: any): any { 
+  if (err.response && err.response.errors) { throw new NotFound("Building not found") }
+  throw err;
+}
+
+/* GraphQL doesn't error out when a key doesn't return a room, so this function takes care of that*/
+function GraphQLLogicHandler(response: any): any { 
+  if (response.building.rooms.length === 0) { throw new NotFound("Room not found") }
+  if (response.building.rooms[0].desks.length === 0) { throw new NotFound("Desk not found") }
+  return response;
+}
+
+class GraphQLQueries{ 
+  static allDesks(bId: string, rId: string) { 
+    return gql`
+    query{
+      building(id: "${bId}"){
+        name,
+        _id
+        rooms(name: "${rId}"){
+          name,
+          desks{
+            name,
+            incidentReports{_id},
+            bookings{
+              _id,
+              start_time,
+              end_time,
+            }
+          }
+        }
+      }
+    }`
+  }
+
+  static OneDesk(bId: string, rId: string, dId: string) { 
+    return gql`
     query{
       building(id: "${bId}"){
         name,
@@ -83,70 +150,5 @@ export class DeskController {
         }
       }
     }`
-    return GraphQLService.request(query)
-      .then((response) => {
-        GraphQLLogicHandler(response)
-        const desk = response.building.rooms[0].desks[0]
-        return DeskMapper.mapDesk(bId, rId, desk)
-      })
-      .catch((err) => { 
-        return GraphQLErrorHandler(err)
-      })
   }
-
-  @Get("/:deskId/reservations")
-  @Summary("Get 🎭 reservations of a 🔑-identified desk")
-  @(Returns(200, Array).Of(MaskedReservation))
-  @(Returns(404).Description("Not Found"))
-  getReservationsPerRoom(
-    @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomName")
-    rId: number,
-    @PathParams("deskId")
-    dId: number,
-    @QueryParams("day")
-    @Required()
-    @Example("yyyy-MM-dd")
-    @Format("regex")
-    day: string
-  ): Array<MaskedReservation> {
-    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
-    const json: Array<MaskedReservation> = []
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: Math.floor(200),
-        room: {
-          id: rId,
-          name: `R&D Room`
-        },
-        building: {
-          id: bId,
-          name: `The Spire`
-        },
-        desk: {
-          id: i,
-          name: `Desk ${i}`
-        },
-        startTime: new Date(),
-        endTime: new Date()
-      }
-      json.push(element);
-    };
-    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
-  }
-}
-
-/* Because GraphQL error message are inconsistent, Errors need to be judge on a case-by-case method */ 
-function GraphQLErrorHandler(err: any): any { 
-  if (err.response && err.response.errors) { throw new NotFound("Building not found") }
-  throw err;
-}
-
-/* GraphQL doesn't error out when a key doesn't return a room, so this function takes care of that*/
-function GraphQLLogicHandler(response: any): any { 
-  if (response.building.rooms.length === 0) { throw new NotFound("Room not found") }
-  if (response.building.rooms[0].desks.length === 0) { throw new NotFound("Desk not found") }
-  return response;
 }
