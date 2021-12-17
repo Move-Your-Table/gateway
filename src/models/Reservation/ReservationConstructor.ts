@@ -18,7 +18,7 @@ export default class ReservationConstructor {
 
     @Property()
     @Minimum(0)
-    deskId?: string;
+    deskId: string;
 
     @Property()
     @Required()

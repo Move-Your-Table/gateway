@@ -7,6 +7,12 @@ import ReservationConstructor from "../models/Reservation/ReservationConstructor
 import ReservationMutator from "../models/Reservation/ReservationMutator";
 import { gql } from "graphql-request";
 import GraphQLService from "src/services/GraphQlService";
+import ReservationMapper from "src/models/Reservation/ReservationMapper";
+import { BuildingController } from "./BuildingController";
+import { RoomController } from "./RoomController";
+import { DeskController } from "./DeskController";
+import MaskedReservation from "src/models/Reservation/MaskedReservation";
+import { NotFound } from "@tsed/exceptions";
 
 @Controller("/reservations")
 @Docs("admin-api", "general-api")
@@ -52,9 +58,9 @@ export class ReservationController {
   @Returns(200, Reservation)
   @Returns(400).Description("Bad Request")
   @Returns(404).Description("Not Found")
-  async CreateReservation(@BodyParams() payload: ReservationMutator): Promise<ReservationConstructor> {
+  async CreateReservation(@BodyParams() payload: ReservationMutator): Promise<MaskedReservation | Reservation> {
     console.log("START");
-    const query = gql`
+    const reservationQuery = gql`
       mutation addBookingToDesk($id: String!, $roomName: String!, $deskName: String!, $bookingInput: BookingInput!) {
         addBookingToDesk(
           buildingId: $id,
@@ -74,7 +80,35 @@ export class ReservationController {
         }
       }
     `
-    // console.log(query);
+    
+    const buildingQuery = gql`
+      query getSpecificBuilding($id: String!, $roomName: String!, $deskName: String!) {
+        building(id: $id) {
+          _id
+          name
+          address {
+            street
+            city
+            postalcode
+            country
+          }
+          rooms(name: $roomName){
+            name
+            desks(name: $deskName) {
+              name
+            }
+          }
+        }
+      }
+    `
+
+    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomId, deskName: payload.deskId});
+    const building = buildingRes.building as any;
+    
+    let rooms = building.rooms;
+
+    let room = rooms[0];
+    let desk = room.desks[0];
 
     const bookingInput = {
       user_id: payload.userId,
@@ -82,17 +116,10 @@ export class ReservationController {
       end_time: payload.endTime,
       public: true,
     }
-    console.log("INPUT", bookingInput);
-    const result = await GraphQLService.request(query, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingInput: bookingInput});
+    const result = await GraphQLService.request(reservationQuery, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingInput: bookingInput});
     const reservation = result.addBookingToDesk as any;
-    console.log("RESERVATION", reservation);
-    return {
-      userId: reservation.user._id,
-      buildingId: reservation._id,
-      startTime: reservation.start_time,
-      endTime: reservation.end_time,
-      roomId: reservation
-    };
+
+    return ReservationMapper.mapReservation(building, room, desk, reservation, true);
   }
 
 
