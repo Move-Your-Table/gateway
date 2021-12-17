@@ -1,7 +1,12 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
+import { NotFound } from "@tsed/exceptions";
 import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
+import { gql } from "graphql-request";
+import DeskMapper from "../models/Desks/DeskMapper";
+import Reservation from "../models/Reservation/Reservation";
+import GraphQLService from "../services/GraphQlService";
 import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
@@ -14,96 +19,34 @@ export class DeskController {
   @Summary("Get all desks with reservations")
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
-  findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
+  async findAll(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Desk<MaskedReservation>> {
-    const json: Array<Desk<MaskedReservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        name: `Dual Desk ${i}`,
-        type: `Dual Desk`,
-        incidents: i,
-        features: [
-          `${i} desk lamps`,
-          `Excellent WI-Fi Access`,
-          `LAN ports through FireWire`
-        ],
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: i,
-              name: `Desk ${i}`
-            },
-            startTime: new Date(),
-            endTime: new Date()
-          }
-        ]
-      };
-      json.push(element);
+  ): Promise<Array<Desk<MaskedReservation>>> {
+    const desks = await DeskController.getDesks(bId, rId, name, false);
+
+    if(desks.length === 0) {
+      throw new NotFound("Desks not found.");
+    } else {
+      return desks;
     }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
-    return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: rId,
-            name: `Desk ${rId}`
-          },
-          startTime: new Date(),
-          endTime: new Date()
-        }
-      ]
-    };
+  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
+    const desks = await DeskController.getDesks(bId, rId, dId, false);
+
+    if(desks.length === 0) {
+      throw new NotFound("Desks not found.");
+    } else {
+      return desks[0];
+    }
   }
 
   @Get("/:deskId/reservations")
@@ -147,5 +90,40 @@ export class DeskController {
       json.push(element);
     };
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+  }
+
+  static async getDesks(buildingId: string, roomName: string, deskName: string, detailedReservations: Boolean) : Promise<Array<Desk<Reservation|MaskedReservation>>> {
+    const query = gql`
+    query getDesks($buildingId:String!, $roomName:String!, $deskName:String) {
+      building(id:$buildingId) {
+        _id
+        rooms(name:$roomName) {
+          name
+          desks(name:$deskName) {
+            name
+            incidentReports {
+              _id
+            }
+            bookings {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
+          }
+        }
+      }
+    }
+    `
+
+    const result = await GraphQLService.request(query, 
+      {buildingId: buildingId, roomName: roomName, deskName: deskName});
+    const building = result.building as any;
+    return DeskMapper.mapDesks(building, detailedReservations);
   }
 }
