@@ -10,7 +10,6 @@ import DeskMapper from "../models/Desks/DeskMapper";
 import { fullDateCheck } from "../helpers/date";
 import { BadRequest, NotFound } from "@tsed/exceptions";
 import MaskedReservationMapper from "../models/Reservation/MaskedReservationMapper";
-import GraphQlErrorHandler from "../helpers/error/GraphQLErrorHandler";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")

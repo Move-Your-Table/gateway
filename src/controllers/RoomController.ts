@@ -7,8 +7,8 @@ import RoomMapper from "../models/Room/RoomMapper";
 import GraphQLService from "src/services/GraphQlService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
-import { fullDateCheck } from "src/helpers/date";
-import Reservation from "src/models/Reservation/Reservation";
+import { fullDateCheck } from "../helpers/date";
+import Reservation from "../models/Reservation/Reservation";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")

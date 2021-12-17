@@ -10,8 +10,7 @@ import RoomConstructor from "../../models/Room/RoomConstructor";
 import RoomMutator from "../../models/Room/RoomMutator";
 import { RoomController } from "../RoomController";
 import { gql } from "graphql-request";
-import GraphQLService from "src/services/GraphQlService";
-
+import GraphQLService from "../../services/GraphQlService";
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
 @Tags("Rooms")
