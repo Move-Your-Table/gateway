@@ -8,8 +8,7 @@ import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import DeskMapper from "../models/Desks/DeskMapper";
 import { fullDateCheck } from "../helpers/date";
-import Building from "../models/Building/Building";
-import { InternalServerError, NotFound } from "@tsed/exceptions";
+import { NotFound } from "@tsed/exceptions";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -47,8 +46,7 @@ export class DeskController {
     }`
     return GraphQLService.request(query)
       .then((response) => {
-        if (response.errors) {throw new NotFound("Building not found")}
-        if (response.building.rooms.length === 0) { throw new NotFound("Room not found")}
+        GraphQLLogicHandler(response)
         return response.building.rooms[0].desks.map((desk: Array<any>) => DeskMapper.mapDesk(bId, rId, desk))
       })
       .then((response: Array<Desk<MaskedReservation>>) => { 
@@ -56,53 +54,44 @@ export class DeskController {
           .filter((room) => room.name.includes(name || ""))
           .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
           .filter((room) => room.type.includes(type || ""));
-      }).catch((err) => { 
-        if (err.message.includes("Cast to ObjectId")) { 
-          throw new NotFound("Building not found")
-        }
-        throw new InternalServerError("Something went wrong")
       })
+      .catch((err) => { 
+        return GraphQLErrorHandler(err)
+      });
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") rId: string, @PathParams("deskId") dId: string): Desk<MaskedReservation> {
-    return {
-      id: dId,
-      buildingId: bId,
-      roomName: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: rId,
-            name: `Desk ${rId}`
-          },
-          startTime: new Date(),
-          endTime: new Date()
+  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
+    const query = gql`
+    query{
+      building(id: "${bId}"){
+        name,
+        rooms(name: "${rId}"){
+          name,
+          desks(name: "${dId}"){
+            name,
+            incidentReports{_id},
+            bookings{
+              _id,
+              start_time,
+              end_time,
+            }
+          }
         }
-      ]
-    };
+      }
+    }`
+    return GraphQLService.request(query)
+      .then((response) => {
+        GraphQLLogicHandler(response)
+        const desk = response.building.rooms[0].desks[0]
+        return DeskMapper.mapDesk(bId, rId, desk)
+      })
+      .catch((err) => { 
+        return GraphQLErrorHandler(err)
+      })
   }
 
   @Get("/:deskId/reservations")
@@ -147,4 +136,17 @@ export class DeskController {
     };
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
+}
+
+/* Because GraphQL error message are inconsistent, Errors need to be judge on a case-by-case method */ 
+function GraphQLErrorHandler(err: any): any { 
+  if (err.response && err.response.errors) { throw new NotFound("Building not found") }
+  throw err;
+}
+
+/* GraphQL doesn't error out when a key doesn't return a room, so this function takes care of that*/
+function GraphQLLogicHandler(response: any): any { 
+  if (response.building.rooms.length === 0) { throw new NotFound("Room not found") }
+  if (response.building.rooms[0].desks.length === 0) { throw new NotFound("Desk not found") }
+  return response;
 }
