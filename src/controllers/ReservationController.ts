@@ -122,41 +122,6 @@ export class ReservationController {
     return ReservationMapper.mapReservation(building, room, desk, reservation, true);
   }
 
-
-
-
-  // @Patch("/:reservationId")
-  // @Summary("Edit a 🔑-identified reservation 🥽")
-  // @Description("- When the desk-Id is undefined, null or not given, the room will be reserved. \n - For date, you can use a ECMAScript Date object and parse this to a string, we'll handle the rest.")
-  // @Returns(200, Reservation)
-  // @Returns(400).Description("Bad Request")
-  // @Returns(404).Description("Not Found")
-  // editReservation(@BodyParams() payload: ReservationMutator, @PathParams("reservationId") rId: number): Reservation {
-  //   return {
-  //     id: rId,
-  //     building: {
-  //       id: payload.buildingId || 0,
-  //       name: (payload.buildingId) ? "Changed name" : "Unchanged name"
-  //     },
-  //     room: {
-  //       id: payload.roomId || 0,
-  //       name: (payload.roomId) ? "Changed name" : "Unchanged name"
-  //     },
-  //     desk: {
-  //       id: payload.deskId || 0,
-  //       name: (payload.deskId) ? "Changed name" : "Unchanged name"
-  //     },
-  //     startTime: new Date(payload.startTime) || new Date(),
-  //     endTime: new Date(payload.endTime) || new Date(),
-  //     reserved_for: {
-  //       id: 1,
-  //       first_name: "JJ",
-  //       last_name: "Johnson",
-  //       company: "NB Electronics"
-  //     }
-  //   }
-  // }
-
   @Delete("/:reservationId")
   @Summary("Delete a 🔑-identified reservation 🧨")
   @Returns(200, Reservation)
