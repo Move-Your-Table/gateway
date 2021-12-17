@@ -6,12 +6,12 @@ import Reservation from "../models/Reservation/Reservation";
 import ReservationConstructor from "../models/Reservation/ReservationConstructor";
 import ReservationMutator from "../models/Reservation/ReservationMutator";
 import { gql } from "graphql-request";
-import GraphQLService from "src/services/GraphQlService";
-import ReservationMapper from "src/models/Reservation/ReservationMapper";
+import GraphQLService from "../services/GraphQlService";
+import ReservationMapper from "../models/Reservation/ReservationMapper";
 import { BuildingController } from "./BuildingController";
 import { RoomController } from "./RoomController";
 import { DeskController } from "./DeskController";
-import MaskedReservation from "src/models/Reservation/MaskedReservation";
+import MaskedReservation from "../models/Reservation/MaskedReservation";
 import { NotFound } from "@tsed/exceptions";
 
 @Controller("/reservations")
