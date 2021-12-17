@@ -1,4 +1,4 @@
-import { Minimum, Property, Required } from "@tsed/schema";
+import { Minimum, Property  } from "@tsed/schema";
 
 export class ObjectDetails {
     @Minimum(0)
