@@ -3,6 +3,5 @@ import BuildingConstructor from "./BuildingConstructor";
 
 export default class Building extends BuildingConstructor {
   @Required()
-  @Minimum(0)
-  id: number;
+  id: string;
 }

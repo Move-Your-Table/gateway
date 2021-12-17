@@ -4,7 +4,7 @@ import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/sc
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import RoomMapper from "../models/Room/RoomMapper";
-import GraphQLService from "../services/GraphQlService";
+import GraphQLService from "../services/GraphQLService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
 import { fullDateCheck } from "../helpers/date";
@@ -21,19 +21,21 @@ export class RoomController {
   async findAll(
     @PathParams("buildingId") id: string,
     @QueryParams("name") name: string,
-    @QueryParams("incidents") showWithIncidents: boolean = true,
+    @QueryParams("incidents") showWithIncidents: boolean = false,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation>>> {
-      return await RoomController.getRooms(id, false, name);
+      return await RoomController.getRooms(id, false, showWithIncidents ,name, type);
     }
   
 
-  @Get("/:roomId")
+  @Get("/:roomName")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
-  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string): Promise<Room<MaskedReservation>|null> {
-    const rooms = await RoomController.getRooms(bId, false, rId);
+  async findDesk(@PathParams("buildingId") bId: string, 
+  @PathParams("roomName") roomName: string,
+  @QueryParams("incidents") showWithIncidents: boolean = true): Promise<Room<MaskedReservation>|null> {
+    const rooms = await RoomController.getRooms(bId, false, showWithIncidents, roomName);
 
     if(rooms.length === 0) {
       return null;
@@ -42,15 +44,15 @@ export class RoomController {
     }
   }
 
-  @Get("/:roomId/reservations")
+  @Get("/:roomName/reservations")
   @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🎭 reservations of a 🔑-identified  room")
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomId")
-    rId: number,
+    bId: string,
+    @PathParams("roomName")
+    roomName: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -62,9 +64,9 @@ export class RoomController {
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
-          id: rId,
+          id: roomName,
           name: `R&D Room`
         },
         building: {
@@ -80,19 +82,27 @@ export class RoomController {
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 
-  static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
+  static async getRooms(buildingId: string, detailedReservations: Boolean, incidentReports : Boolean,
+    roomName: string, type: string = "") : Promise<Array<Room<Reservation|MaskedReservation>>> {
     const query = gql`
-    query getRooms($id:String!, $name: String) {
+    query getRooms($id:String!, $name: String, $type: String) {
       building(id:$id) {
         _id
         name
-        rooms(name:$name) {
+        rooms(name:$name, type:$type) {
           name
           type
           features
           floor
           incidentReports {
             _id
+            message
+            user {
+              _id
+              first_name
+              last_name
+              company
+            }
           }
           desks {
             name
@@ -113,9 +123,9 @@ export class RoomController {
     }
     `
 
-    const result = await GraphQLService.request(query, {id: buildingId, name: roomName});
+    const result = await GraphQLService.request(query, {id: buildingId, name: roomName, type: type});
     const building = result.building as any;
-    return RoomMapper.mapRooms(building, detailedReservations);
+    return RoomMapper.mapRooms(building, detailedReservations, incidentReports);
   }
 }
 

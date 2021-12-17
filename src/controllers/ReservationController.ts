@@ -22,21 +22,21 @@ export class ReservationController {
   @Get("/")
   @Summary("Get all reservations of a user")
   @Returns(200, Array).Of(Reservation)
-  getReservations(@QueryParams("userId") @Required() @Minimum(0) id: number): Array<Reservation> {
+  getReservations(@QueryParams("userId") @Required() @Minimum(0) id: string): Array<Reservation> {
     const json: Array<Reservation> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i + 1,
+        id: (i + 1).toString(),
         building: {
-          id: i + 2,
+          id: (i + 2).toString(),
           name: `building ${i + 2}`
         },
         room: {
-          id: i + 3,
+          id: (i + 3).toString(),
           name: `room ${i + 3}`
         },
         desk: {
-          id: i + 4,
+          id: (i + 4).toString(),
           name: `desk ${i + 4}`
         },
         startTime: new Date(),
@@ -102,7 +102,7 @@ export class ReservationController {
       }
     `
 
-    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomId, deskName: payload.deskId});
+    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
     const building = buildingRes.building as any;
     
     let rooms = building.rooms;
@@ -116,7 +116,7 @@ export class ReservationController {
       end_time: payload.endTime,
       public: true,
     }
-    const result = await GraphQLService.request(reservationQuery, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingInput: bookingInput});
+    const result = await GraphQLService.request(reservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingInput: bookingInput});
     const reservation = result.addBookingToDesk as any;
 
     return ReservationMapper.mapReservation(building, room, desk, reservation, true);
@@ -166,7 +166,7 @@ export class ReservationController {
       }
     `
 
-    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomId, deskName: payload.deskId});
+    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
     const building = buildingRes.building as any;
 
     let rooms = building.rooms;
@@ -174,7 +174,7 @@ export class ReservationController {
     let room = rooms[0];
     let desk = room.desks[0];
 
-    const result = await GraphQLService.request(deleteReservationQuery, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingId: reservationId});
+    const result = await GraphQLService.request(deleteReservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingId: reservationId});
     const reservation = result.cancelBookingFromDesk as any;
 
     return ReservationMapper.mapReservation(building, room, desk, reservation, true);
