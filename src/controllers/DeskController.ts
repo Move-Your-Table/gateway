@@ -94,7 +94,7 @@ export class DeskController {
 
   static async getDesks(buildingId: string, roomName: string, deskName: string, detailedReservations: Boolean) : Promise<Array<Desk<Reservation|MaskedReservation>>> {
     const query = gql`
-    query getDesks($buildingId:String!, $roomName:String!, $deskName:String!) {
+    query getDesks($buildingId:String!, $roomName:String!, $deskName:String) {
       building(id:$buildingId) {
         _id
         rooms(name:$roomName) {

@@ -1,4 +1,4 @@
-import { Property, Required, Minimum } from "@tsed/schema";
+import { Property, Required, Minimum, Example } from "@tsed/schema";
 
 export default class DeskConstructor {
     @Property()
@@ -11,6 +11,7 @@ export default class DeskConstructor {
 
     @Property()
     @Required()
+    @Example([])
     features: Array<string>;
 
     @Property()

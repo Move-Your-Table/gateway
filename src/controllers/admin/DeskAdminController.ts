@@ -9,6 +9,8 @@ import DeskConstructor from "../../models/Desks/DeskConstructor";
 import DeskMutator from "../../models/Desks/DeskMutator";
 import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import Reservation from "../../models/Reservation/Reservation";
+import { gql } from "graphql-request";
+import GraphQLService from "src/services/GraphQlService";
 
 @Controller("/admin/building/:buildingId/room/:roomId/desks")
 @Docs("admin-api")
@@ -21,7 +23,7 @@ export class DeskAdminController {
   async findAll(
     @PathParams("buildingId") bId: string,
     @PathParams("roomId") rId: string,
-    @QueryParams("name") name: string="",
+    @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
@@ -42,22 +44,33 @@ export class DeskAdminController {
   @(Returns(201, Desk).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateDesk(
+  async CreateDesk(
     @BodyParams() payload: DeskConstructor,
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number
-  ): Desk<Reservation> {
-    return {
-      id: 22,
-      buildingId: bId,
-      roomId: rId,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string
+  ): Promise<DeskConstructor> {
+    const query = gql`
+      mutation addDesk($buildingId:String!, $roomName:String!, $deskInput:DeskInput!) {
+        addDeskToRoom(buildingId: $buildingId, roomName: $roomName, deskInput: $deskInput) {
+          name
+        }
+      }
+    `
+
+    const deskInput = {
       name: payload.name,
-      type: payload.type,
-      incidents: 0,
-      features: payload.features,
-      capacity: payload.capacity,
-      floor: payload.floor,
-      reservations: []
+      features: payload.features
+    }
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskInput: deskInput});
+    const desk = result.addDeskToRoom as any;
+    return {
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 
