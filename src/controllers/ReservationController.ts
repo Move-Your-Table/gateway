@@ -5,6 +5,7 @@ import { Docs } from "@tsed/swagger";
 import Reservation from "../models/Reservation/Reservation";
 import ReservationConstructor from "../models/Reservation/ReservationConstructor";
 import ReservationMutator from "../models/Reservation/ReservationMutator";
+import DeleteReservationConstructor from "../models/Reservation/DeleteReservationConstructor";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import ReservationMapper from "../models/Reservation/ReservationMapper";
@@ -59,7 +60,6 @@ export class ReservationController {
   @Returns(400).Description("Bad Request")
   @Returns(404).Description("Not Found")
   async CreateReservation(@BodyParams() payload: ReservationMutator): Promise<MaskedReservation | Reservation> {
-    console.log("START");
     const reservationQuery = gql`
       mutation addBookingToDesk($id: String!, $roomName: String!, $deskName: String!, $bookingInput: BookingInput!) {
         addBookingToDesk(
@@ -161,29 +161,58 @@ export class ReservationController {
   @Summary("Delete a 🔑-identified reservation 🧨")
   @Returns(200, Reservation)
   @Returns(404).Description("Not Found")
-  deleteReservation(): Reservation {
-    return {
-      id: Math.floor(200),
-      building: {
-        id: 6,
-        name: `building 6`
-      },
-      room: {
-        id: 2,
-        name: `room 2`
-      },
-      desk: {
-        id: 4,
-        name: `desk 4`
-      },
-      startTime: new Date(),
-      endTime: new Date(),
-      reserved_for: {
-        id: 1,
-        first_name: "JJ",
-        last_name: "Johnson",
-        company: "NB Electronics"
+  async deleteReservation(@PathParams("reservationId") reservationId: string, @BodyParams() payload: DeleteReservationConstructor): Promise<MaskedReservation | Reservation> {
+    console.log("DELETING");
+    const deleteReservationQuery = gql`
+    mutation deleteReservation($id: String!, $roomName: String!, $deskName: String!, $bookingId: String!) {
+      cancelBookingFromDesk(
+        buildingId: $id,
+        roomName: $roomName,
+        deskName: $deskName,
+        bookingId: $bookingId)
+      {
+        _id
+        user {
+          _id
+          first_name
+          last_name
+          company
+        }
+        start_time
+        end_time 
       }
     }
+    
+    `
+
+
+    const buildingQuery = gql`
+      query getSpecificBuilding($id: String!, $roomName: String!, $deskName: String!) {
+        building(id: $id) {
+          _id
+          name
+          rooms(name: $roomName){
+            name
+            desks(name: $deskName) {
+              name
+            }
+          }
+        }
+      }
+    `
+
+    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomId, deskName: payload.deskId});
+    const building = buildingRes.building as any;
+
+    let rooms = building.rooms;
+
+    let room = rooms[0];
+    let desk = room.desks[0];
+
+    const result = await GraphQLService.request(deleteReservationQuery, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingId: reservationId});
+    const reservation = result.cancelBookingFromDesk as any;
+
+    return ReservationMapper.mapReservation(building, room, desk, reservation, true);
+
   }
 }
