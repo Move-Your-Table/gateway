@@ -80,7 +80,7 @@ export class RoomController {
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 
-  static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
+  private static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
     const query = gql`
     query getRooms($id:String!, $name: String) {
       building(id:$id) {
