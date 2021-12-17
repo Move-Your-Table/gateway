@@ -8,13 +8,11 @@ import RoomConstructor from "./RoomConstructor";
 export default class Room<T> extends RoomConstructor {
   @Property()
   @Required()
-  @Minimum(0)
-  id: number;
+  roomName: string;
 
   @Property()
   @Required()
-  @Minimum(0)
-  buildingId: number;
+  buildingId: string;
 
   @Property()
   incidents?: Array<IncidentReport>;

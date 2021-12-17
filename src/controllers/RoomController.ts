@@ -28,14 +28,14 @@ export class RoomController {
     }
   
 
-  @Get("/:roomId")
+  @Get("/:roomName")
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
   async findDesk(@PathParams("buildingId") bId: string, 
-  @PathParams("roomId") rId: string,
+  @PathParams("roomName") roomName: string,
   @QueryParams("incidents") showWithIncidents: boolean = true): Promise<Room<MaskedReservation>|null> {
-    const rooms = await RoomController.getRooms(bId, false, showWithIncidents, rId);
+    const rooms = await RoomController.getRooms(bId, false, showWithIncidents, roomName);
 
     if(rooms.length === 0) {
       return null;
@@ -44,15 +44,15 @@ export class RoomController {
     }
   }
 
-  @Get("/:roomId/reservations")
+  @Get("/:roomName/reservations")
   @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🎭 reservations of a 🔑-identified  room")
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomId")
-    rId: number,
+    bId: string,
+    @PathParams("roomName")
+    roomName: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -64,9 +64,9 @@ export class RoomController {
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
-          id: rId,
+          id: roomName,
           name: `R&D Room`
         },
         building: {

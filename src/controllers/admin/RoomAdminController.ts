@@ -29,14 +29,14 @@ export class RoomAdminController {
    return await RoomController.getRooms(id, true, showWithIncidents, name, type);
   }
 
-  @Get("/:roomId")
+  @Get("/:roomName")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
   async findRoom(@PathParams("buildingId") bId: string, 
-  @PathParams("roomId") rId: string,
+  @PathParams("roomName") roomName: string,
   @QueryParams("incidents") showWithIncidents: boolean = false,): Promise<Array<Room<MaskedReservation|Reservation>>> {
-    return await RoomController.getRooms(bId, true, showWithIncidents, rId);
+    return await RoomController.getRooms(bId, true, showWithIncidents, roomName);
   }
 
   @Post()
@@ -74,7 +74,7 @@ export class RoomAdminController {
     };
   }
 
-  @Patch("/:roomId")
+  @Patch("/:roomName")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
@@ -82,7 +82,7 @@ export class RoomAdminController {
   @Summary("Edit a 🔑-identified room 🥽")
   async EditRoom(
     @PathParams("buildingId") bId: string,
-    @PathParams("roomId") rId: string,
+    @PathParams("roomName") roomName: string,
     @BodyParams() payload: RoomMutator
   ): Promise<RoomConstructor> {
     const query = gql`
@@ -105,7 +105,7 @@ export class RoomAdminController {
       features: payload.features,
     }
 
-    const result = await GraphQLService.request(query, {id:bId, roomName: rId, roomInput: roomInput});
+    const result = await GraphQLService.request(query, {id:bId, roomName: roomName, roomInput: roomInput});
     const room = result.updateRoom as any;
     return {
       name: room.name,
@@ -116,25 +116,25 @@ export class RoomAdminController {
     };
   }
 
-  @Delete("/:roomId")
+  @Delete("/:roomName")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   @Summary("Delete a 🔑-identified room 🧨")
-  DeleteRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
+  DeleteRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") roomName: string): Room<Reservation> {
     return {
-      id: rId,
+      roomName: roomName,
       buildingId: bId,
-      name: `R&D Room ${rId}`,
+      name: `R&D Room ${roomName}`,
       type: `R&D Room`,
       features: ["yeet"],
-      capacity: bId,
-      floor: bId,
+      capacity: 0,
+      floor: 0,
       reservations: [
         {
-          id: Math.floor(200),
+          id: Math.floor(200).toString(),
           room: {
-            id: rId,
+            id: roomName,
             name: `R&D Room`
           },
           building: {
@@ -145,7 +145,7 @@ export class RoomAdminController {
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
-            id: 1,
+            id: "1",
             first_name: "JJ",
             last_name: "Johnson",
             company: "NB Electronics"
@@ -155,15 +155,15 @@ export class RoomAdminController {
     };
   }
 
-  @Get("/:roomId/reservations")
+  @Get("/:roomName/reservations")
   @(Returns(200, Array).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomId")
-    rId: number,
+    bId: string,
+    @PathParams("roomName")
+    rId: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -175,7 +175,7 @@ export class RoomAdminController {
     const json: Array<Reservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
           id: rId,
           name: `R&D Room`
@@ -188,7 +188,7 @@ export class RoomAdminController {
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {
-          id: 1,
+          id: "1",
           first_name: "JJ",
           last_name: "Johnson",
           company: "NB Electronics"
