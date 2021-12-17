@@ -24,19 +24,22 @@ export class DeskAdminController {
     @PathParams("buildingId") bId: string,
     @PathParams("roomId") rId: string,
     @QueryParams("name") name: string,
-    @QueryParams("incidents") showWithIncidents: boolean = true,
+    @QueryParams("incidents") showWithIncidents: boolean = false,
     @QueryParams("type") type: string
   ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
-    return await DeskController.getDesks(bId, rId, name, true);
+    return await DeskController.getDesks(bId, rId, name, true, showWithIncidents);
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🔍 detailed reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string
+  async findDesk(@PathParams("buildingId") bId: string, 
+  @PathParams("roomId") rId: string, 
+  @PathParams("deskId") dId: string,
+  @QueryParams("incidents") showWithIncidents: boolean = false,
   ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
-    return await DeskController.getDesks(bId, rId, dId, true);
+    return await DeskController.getDesks(bId, rId, dId, true, showWithIncidents);
   }
 
   @Post()
