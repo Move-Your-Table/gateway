@@ -26,7 +26,7 @@ export class RoomAdminController {
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation|Reservation>>> {
-   return await RoomController.getRooms(id, true, name);
+   return await RoomController.getRooms(id, true, name, type);
   }
 
   @Get("/:roomId")

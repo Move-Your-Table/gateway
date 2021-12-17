@@ -24,7 +24,7 @@ export class RoomController {
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation>>> {
-      return await RoomController.getRooms(id, false, name);
+      return await RoomController.getRooms(id, false, name, type);
     }
   
 
@@ -80,13 +80,14 @@ export class RoomController {
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 
-  static async getRooms(buildingId: string, detailedReservations: Boolean, roomName: string) : Promise<Array<Room<Reservation|MaskedReservation>>> {
+  static async getRooms(buildingId: string, detailedReservations: Boolean, 
+    roomName: string, type: string = "") : Promise<Array<Room<Reservation|MaskedReservation>>> {
     const query = gql`
-    query getRooms($id:String!, $name: String) {
+    query getRooms($id:String!, $name: String, $type: String) {
       building(id:$id) {
         _id
         name
-        rooms(name:$name) {
+        rooms(name:$name, type:$type) {
           name
           type
           features
@@ -113,7 +114,7 @@ export class RoomController {
     }
     `
 
-    const result = await GraphQLService.request(query, {id: buildingId, name: roomName});
+    const result = await GraphQLService.request(query, {id: buildingId, name: roomName, type: type});
     const building = result.building as any;
     return RoomMapper.mapRooms(building, detailedReservations);
   }
