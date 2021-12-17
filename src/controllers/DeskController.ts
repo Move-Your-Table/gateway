@@ -15,12 +15,12 @@ export class DeskController {
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Desk<MaskedReservation>> {
+  ): Promise<Array<Desk<MaskedReservation>>> {
     const json: Array<Desk<MaskedReservation>> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
