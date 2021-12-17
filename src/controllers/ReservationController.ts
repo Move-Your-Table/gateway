@@ -6,7 +6,7 @@ import Reservation from "../models/Reservation/Reservation";
 import ReservationMutator from "../models/Reservation/ReservationMutator";
 import DeleteReservationConstructor from "../models/Reservation/DeleteReservationConstructor";
 import { gql } from "graphql-request";
-import GraphQLService from "../services/GraphQlService";
+import GraphQLService from "../services/GraphQLService";
 import ReservationMapper from "../models/Reservation/ReservationMapper";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 
