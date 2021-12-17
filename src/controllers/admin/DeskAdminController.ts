@@ -58,7 +58,7 @@ export class DeskAdminController {
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
-              id: 1,
+              id: "dzqhdqzhdjzqbd",
               first_name: "JJ",
               last_name: "Johnson",
               company: "NB Electronics"
@@ -111,7 +111,7 @@ export class DeskAdminController {
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
-            id: 1,
+            id: "hbqzhdjbqzkhdbzqhgd",
             first_name: "JJ",
             last_name: "Johnson",
             company: "NB Electronics"
@@ -189,7 +189,7 @@ export class DeskAdminController {
             startTime: new Date(),
             endTime: new Date(),
             reserved_for: {
-              id: 1,
+              id: "jhzdbqhkjdbkqdbqhkjd",
               first_name: "JJ",
               last_name: "Johnson",
               company: "NB Electronics"
@@ -241,7 +241,7 @@ export class DeskAdminController {
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
-            id: 1,
+            id: "jdbqhdjbqkdhkbdb",
             first_name: "JJ",
             last_name: "Johnson",
             company: "NB Electronics"
@@ -286,7 +286,7 @@ export class DeskAdminController {
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {
-          id: 1,
+          id: "nzqdkjqzdnqjdnjh",
           first_name: "JJ",
           last_name: "Johnson",
           company: "NB Electronics"

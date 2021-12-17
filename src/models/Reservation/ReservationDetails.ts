@@ -1,7 +1,6 @@
 import { Minimum, Property  } from "@tsed/schema";
 
 export class ObjectDetails {
-    @Minimum(0)
     @Property()
     id: string;
 

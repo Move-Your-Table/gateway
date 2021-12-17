@@ -147,7 +147,7 @@ export class RoomAdminController {
           startTime: new Date(),
           endTime: new Date(),
           reserved_for: {
-            id: 1,
+            id: "djqdnjkqdnqljdn",
             first_name: "JJ",
             last_name: "Johnson",
             company: "NB Electronics"
@@ -190,7 +190,7 @@ export class RoomAdminController {
         startTime: new Date(),
         endTime: new Date(),
         reserved_for: {
-          id: 1,
+          id: "bqdzkjhbzhdbzqk",
           first_name: "JJ",
           last_name: "Johnson",
           company: "NB Electronics"

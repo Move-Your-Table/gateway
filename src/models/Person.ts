@@ -2,8 +2,7 @@ import {Minimum, Property} from "@tsed/schema";
 
 export default class Person {
   @Property()
-  @Minimum(0)
-  id: number;
+  id: string;
 
   @Property()
   first_name: string;

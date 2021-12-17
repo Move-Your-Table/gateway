@@ -13,7 +13,7 @@ export class ReservationController {
   @Get("/")
   @Summary("Get all reservations of a user")
   @Returns(200, Array).Of(Reservation)
-  getReservations(@QueryParams("userId") @Required() @Minimum(0) id: number): Array<Reservation> {
+  getReservations(@QueryParams("userId") @Required() @Minimum(0) id: string): Array<Reservation> {
     const json: Array<Reservation> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
@@ -70,7 +70,7 @@ export class ReservationController {
       startTime: new Date(),
       endTime: new Date(),
       reserved_for: {
-        id: 1,
+        id: "zdqzndqljdnlqd",
         first_name: "JJ",
         last_name: "Johnson",
         company: "NB Electronics"
@@ -102,7 +102,7 @@ export class ReservationController {
       startTime: new Date(payload.startTime) || new Date(),
       endTime: new Date(payload.endTime) || new Date(),
       reserved_for: {
-        id: 1,
+        id: "jbdhkjqbdqkbdhqj",
         first_name: "JJ",
         last_name: "Johnson",
         company: "NB Electronics"
@@ -132,7 +132,7 @@ export class ReservationController {
       startTime: new Date(),
       endTime: new Date(),
       reserved_for: {
-        id: 1,
+        id: "dbqdbqjbdqbdqbdk",
         first_name: "JJ",
         last_name: "Johnson",
         company: "NB Electronics"
