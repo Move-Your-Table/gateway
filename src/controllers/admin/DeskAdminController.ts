@@ -3,6 +3,7 @@ import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { fullDateCheck } from "../../helpers/date";
+import { DeskController } from "../DeskController";
 import Desk from "../../models/Desks/Desk";
 import DeskConstructor from "../../models/Desks/DeskConstructor";
 import DeskMutator from "../../models/Desks/DeskMutator";
@@ -17,108 +18,23 @@ export class DeskAdminController {
   @Summary("Get all desks with 🔍 detailed reservations")
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
-  findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @QueryParams("name") name: string,
+  async findAll(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @QueryParams("name") name: string="",
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Desk<Reservation>> {
-    const json: Array<Desk<Reservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        name: `Dual Desk ${i}`,
-        type: `Dual Desk`,
-        incidents: i,
-        features: [
-          `${i} desk lamps`,
-          `Excellent WI-Fi Access`,
-          `LAN ports through FireWire`
-        ],
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: i,
-              name: `Desk ${i}`
-            },
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
-      };
-      json.push(element);
-    }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
+  ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
+    return await DeskController.getDesks(bId, rId, name, true);
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🔍 detailed reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<Reservation> {
-    return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: dId,
-            name: `Desk ${dId}`
-          },
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: 1,
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
-          }
-        }
-      ]
-    };
+  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string
+  ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
+    return await DeskController.getDesks(bId, rId, dId, true);
   }
 
   @Post()

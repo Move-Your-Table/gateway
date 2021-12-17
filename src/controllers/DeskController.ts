@@ -26,7 +26,7 @@ export class DeskController {
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Desk<MaskedReservation>>> {
-    const desks = await DeskController.getDesks(bId, rId, false);
+    const desks = await DeskController.getDesks(bId, rId, name, false);
 
     if(desks.length === 0) {
       throw new NotFound("Desks not found.");
@@ -40,43 +40,13 @@ export class DeskController {
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
-    const query = gql`
-    query getSpecificDesk($buildingId:String!, $roomName:String!, $deskName:String!) {
-      building(id:$buildingId) {
-        _id
-        rooms(name:$roomName) {
-          name
-          desks(name: $deskName){
-            name
-            incidentReports {
-              _id
-            }
-            bookings {
-              _id
-              start_time
-              end_time
-              user {
-                _id
-                first_name
-                last_name
-                company
-              }
-            }
-          }
-        }
-      }
+    const desks = await DeskController.getDesks(bId, rId, dId, false);
+
+    if(desks.length === 0) {
+      throw new NotFound("Desks not found.");
+    } else {
+      return desks[0];
     }
-    `
-
-    const result = await GraphQLService.request(query, 
-      {buildingId: bId, roomName: rId, deskName: dId});
-    const building = result.building as any;
-
-    if(building.rooms[0].desks == null) {
-      throw new NotFound("Desk not found");
-    }
-
-    return DeskMapper.mapDesks(building, true)[0];
   }
 
   @Get("/:deskId/reservations")
@@ -122,14 +92,14 @@ export class DeskController {
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 
-  private static async getDesks(buildingId: string, roomName: string, detailedReservations: Boolean) : Promise<Array<Desk<Reservation|MaskedReservation>>> {
+  static async getDesks(buildingId: string, roomName: string, deskName: string, detailedReservations: Boolean) : Promise<Array<Desk<Reservation|MaskedReservation>>> {
     const query = gql`
-    query getDesks($buildingId:String!, $roomName:String!) {
+    query getDesks($buildingId:String!, $roomName:String!, $deskName:String!) {
       building(id:$buildingId) {
         _id
         rooms(name:$roomName) {
           name
-          desks {
+          desks(name:$deskName) {
             name
             incidentReports {
               _id
@@ -151,7 +121,8 @@ export class DeskController {
     }
     `
 
-    const result = await GraphQLService.request(query, {buildingId: buildingId, roomName: roomName});
+    const result = await GraphQLService.request(query, 
+      {buildingId: buildingId, roomName: roomName, deskName: deskName});
     const building = result.building as any;
     return DeskMapper.mapDesks(building, detailedReservations);
   }

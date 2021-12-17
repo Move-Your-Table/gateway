@@ -24,7 +24,7 @@ export default class DeskMapper {
                 // Add reservations
                 desk.bookings.forEach((booking : any) => {
                     mappedDesk.reservations
-                    .push(ReservationMapper.mapReservation(building, room, desk, booking));      
+                    .push(ReservationMapper.mapReservation(building, room, desk, booking, detailedReservations));      
                 });
                 
                 return mappedDesk;
