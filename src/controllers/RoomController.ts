@@ -21,10 +21,10 @@ export class RoomController {
   async findAll(
     @PathParams("buildingId") id: string,
     @QueryParams("name") name: string,
-    @QueryParams("incidents") showWithIncidents: boolean = true,
+    @QueryParams("incidents") showWithIncidents: boolean = false,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation>>> {
-      return await RoomController.getRooms(id, false, name, type);
+      return await RoomController.getRooms(id, false, showWithIncidents ,name, type);
     }
   
 
@@ -32,8 +32,10 @@ export class RoomController {
   @(Returns(200, Room).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Returns 🔑-identified room with 🎭 reservations")
-  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomName") roomName: string): Promise<Room<MaskedReservation>|null> {
-    const rooms = await RoomController.getRooms(bId, false, roomName);
+  async findDesk(@PathParams("buildingId") bId: string, 
+  @PathParams("roomName") roomName: string,
+  @QueryParams("incidents") showWithIncidents: boolean = true): Promise<Room<MaskedReservation>|null> {
+    const rooms = await RoomController.getRooms(bId, false, showWithIncidents, roomName);
 
     if(rooms.length === 0) {
       return null;
@@ -80,7 +82,7 @@ export class RoomController {
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 
-  static async getRooms(buildingId: string, detailedReservations: Boolean, 
+  static async getRooms(buildingId: string, detailedReservations: Boolean, incidentReports : Boolean,
     roomName: string, type: string = "") : Promise<Array<Room<Reservation|MaskedReservation>>> {
     const query = gql`
     query getRooms($id:String!, $name: String, $type: String) {
@@ -94,6 +96,13 @@ export class RoomController {
           floor
           incidentReports {
             _id
+            message
+            user {
+              _id
+              first_name
+              last_name
+              company
+            }
           }
           desks {
             name
@@ -116,7 +125,7 @@ export class RoomController {
 
     const result = await GraphQLService.request(query, {id: buildingId, name: roomName, type: type});
     const building = result.building as any;
-    return RoomMapper.mapRooms(building, detailedReservations);
+    return RoomMapper.mapRooms(building, detailedReservations, incidentReports);
   }
 }
 

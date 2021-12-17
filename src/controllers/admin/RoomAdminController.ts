@@ -23,18 +23,20 @@ export class RoomAdminController {
   async findAll(
     @PathParams("buildingId") id: string,
     @QueryParams("name") name: string,
-    @QueryParams("incidents") showWithIncidents: boolean = true,
+    @QueryParams("incidents") showWithIncidents: boolean = false,
     @QueryParams("type") type: string
   ): Promise<Array<Room<MaskedReservation|Reservation>>> {
-   return await RoomController.getRooms(id, true, name, type);
+   return await RoomController.getRooms(id, true, showWithIncidents, name, type);
   }
 
   @Get("/:roomName")
   @(Returns(200, Room).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
-  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") roomName: string): Promise<Array<Room<MaskedReservation|Reservation>>> {
-    return await RoomController.getRooms(bId, true, roomName);
+  async findRoom(@PathParams("buildingId") bId: string, 
+  @PathParams("roomName") roomName: string,
+  @QueryParams("incidents") showWithIncidents: boolean = false,): Promise<Array<Room<MaskedReservation|Reservation>>> {
+    return await RoomController.getRooms(bId, true, showWithIncidents, roomName);
   }
 
   @Post()
@@ -125,7 +127,6 @@ export class RoomAdminController {
       buildingId: bId,
       name: `R&D Room ${roomName}`,
       type: `R&D Room`,
-      incidents: Math.floor(10),
       features: ["yeet"],
       capacity: 0,
       floor: 0,
