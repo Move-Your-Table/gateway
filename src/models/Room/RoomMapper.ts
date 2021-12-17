@@ -29,11 +29,11 @@ export default class RoomMapper {
                             name: building.name
                         },
                         room: {
-                            id: 0,
+                            id: room.name,
                             name: room.name
                         },
                         desk: {
-                            id: 0,
+                            id: desk.name,
                             name: desk.name
                         },
                         id: booking._id,

@@ -8,12 +8,12 @@ export default class Room<T> extends RoomConstructor {
   @Property()
   @Required()
   @Minimum(0)
-  id: number;
+  id: string;
 
   @Property()
   @Required()
   @Minimum(0)
-  buildingId: number;
+  buildingId: string;
 
   @Property()
   @Minimum(0)

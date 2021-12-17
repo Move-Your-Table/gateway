@@ -48,9 +48,9 @@ export class RoomController {
   @Summary("Returns 🎭 reservations of a 🔑-identified  room")
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
+    bId: string,
     @PathParams("roomId")
-    rId: number,
+    rId: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -62,7 +62,7 @@ export class RoomController {
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
           id: rId,
           name: `R&D Room`

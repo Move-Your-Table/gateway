@@ -18,8 +18,8 @@ export class DeskAdminController {
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
   findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
@@ -27,7 +27,7 @@ export class DeskAdminController {
     const json: Array<Desk<Reservation>> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i,
+        id: (i).toString(),
         buildingId: bId,
         roomId: rId,
         name: `Dual Desk ${i}`,
@@ -42,7 +42,7 @@ export class DeskAdminController {
         floor: i,
         reservations: [
           {
-            id: Math.floor(200),
+            id: Math.floor(200).toString(),
             room: {
               id: rId,
               name: `R&D Room`
@@ -52,7 +52,7 @@ export class DeskAdminController {
               name: `The Spire`
             },
             desk: {
-              id: i,
+              id: (i).toString(),
               name: `Desk ${i}`
             },
             startTime: new Date(),
@@ -78,24 +78,24 @@ export class DeskAdminController {
   @Summary("Get a 🔑-identified desk with 🔍 detailed reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<Reservation> {
+  findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string): Desk<Reservation> {
     return {
       id: dId,
       buildingId: bId,
       roomId: rId,
       name: `Dual Desk ${dId}`,
       type: `Dual Desk`,
-      incidents: dId,
+      incidents: 2,
       features: [
         `${dId} desk lamps`,
         `Excellent WI-Fi Access`,
         `LAN ports through FireWire`
       ],
-      capacity: dId,
-      floor: dId,
+      capacity: 2,
+      floor: 2,
       reservations: [
         {
-          id: Math.floor(200),
+          id: Math.floor(200).toString(),
           room: {
             id: rId,
             name: `R&D Room`
@@ -132,9 +132,9 @@ export class DeskAdminController {
     @PathParams("roomId") rId: number
   ): Desk<Reservation> {
     return {
-      id: 22,
-      buildingId: bId,
-      roomId: rId,
+      id: "22sdbhqjvdhgqjvjh",
+      buildingId: bId.toString(),
+      roomId: rId.toString(),
       name: payload.name,
       type: payload.type,
       incidents: 0,
@@ -152,9 +152,9 @@ export class DeskAdminController {
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   EditDesk(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @PathParams("deskId") dId: number,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @PathParams("deskId") dId: string,
     @QueryParams("clearIncidents") iClear: boolean,
     @QueryParams("clearReservations") rClear: boolean,
     @BodyParams() payload: DeskMutator
@@ -173,7 +173,7 @@ export class DeskAdminController {
         ? []
         : [
           {
-            id: Math.floor(200),
+            id: Math.floor(200).toString(),
             room: {
               id: rId,
               name: `R&D Room`
@@ -204,24 +204,28 @@ export class DeskAdminController {
   @(Returns(200, Desk).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  DeleteDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number,): Desk<Reservation> {
+  DeleteDesk(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @PathParams("deskId") dId: string,
+  ): Desk<Reservation> {
     return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
+      id: dId.toString(),
+      buildingId: bId.toString(),
+      roomId: rId.toString(),
       name: `Dual Desk ${dId}`,
       type: `Dual Desk`,
-      incidents: dId,
+      incidents: 3,
       features: [
         `${dId} desk lamps`,
         `Excellent WI-Fi Access`,
         `LAN ports through FireWire`
       ],
-      capacity: dId,
-      floor: dId,
+      capacity: 3,
+      floor: 4,
       reservations: [
         {
-          id: Math.floor(200),
+          id: Math.floor(200).toString(),
           room: {
             id: rId,
             name: `R&D Room`
@@ -252,11 +256,9 @@ export class DeskAdminController {
   @(Returns(404).Description("Not Found"))
   @Summary("Get 🔍 detailed reservations of a 🔑-identified desk")
   getReservationsPerRoom(
-    @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomId")
-    rId: number,
-    @PathParams("deskId") dId: number,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @PathParams("deskId") dId: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -268,7 +270,7 @@ export class DeskAdminController {
     const json: Array<Reservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
           id: rId,
           name: `R&D Room`

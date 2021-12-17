@@ -9,20 +9,20 @@ export default class DeskMapper {
             buildingId: bId,
             roomId: rId,
             incidents: desk.incidentReports.length,
-            reservations: desk.bookings.map((booking) => {
+            reservations: desk.bookings.map((booking: any) => {
                 return {
-                    id: Math.floor(200),
+                    id: booking._id,
                     room: {
                         id: rId,
-                        name: `R&D Room`
+                        name: rId
                     },
                     building: {
                         id: bId,
-                        name: `The Spire`
+                        name: bId
                     },
                     desk: {
-                        id: Math.floor(200),
-                        name: `Desk ${Math.floor(200)}`
+                        id: desk.name,
+                        name: desk.name
                     },
                     startTime: new Date(),
                     endTime: new Date()

@@ -17,17 +17,17 @@ export class ReservationController {
     const json: Array<Reservation> = [];
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: i + 1,
+        id: (i + 1).toString(),
         building: {
-          id: i + 2,
+          id: (i + 2).toString(),
           name: `building ${i + 2}`
         },
         room: {
-          id: i + 3,
+          id: (i + 3).toString(),
           name: `room ${i + 3}`
         },
         desk: {
-          id: i + 4,
+          id: (i + 4).toString(),
           name: `desk ${i + 4}`
         },
         startTime: new Date(),
@@ -52,7 +52,7 @@ export class ReservationController {
   @Returns(404).Description("Not Found")
   createReservation(@BodyParams() payload: ReservationConstructor): Reservation {
     return {
-      id: Math.floor(200),
+      id: Math.floor(200).toString(),
       building: {
         id: payload.buildingId,
         name: `building ${payload.buildingId}`
@@ -84,19 +84,19 @@ export class ReservationController {
   @Returns(200, Reservation)
   @Returns(400).Description("Bad Request")
   @Returns(404).Description("Not Found")
-  editReservation(@BodyParams() payload: ReservationMutator, @PathParams("reservationId") rId: number): Reservation {
+  editReservation(@BodyParams() payload: ReservationMutator, @PathParams("reservationId") rId: string): Reservation {
     return {
       id: rId,
       building: {
-        id: payload.buildingId || 0,
+        id: payload.buildingId || "sjhqdbqjh",
         name: (payload.buildingId) ? "Changed name" : "Unchanged name"
       },
       room: {
-        id: payload.roomId || 0,
+        id: payload.roomId || "qsdjhqbsjhdbkqjb",
         name: (payload.roomId) ? "Changed name" : "Unchanged name"
       },
       desk: {
-        id: payload.deskId || 0,
+        id: payload.deskId || "sdqhjqhj",
         name: (payload.deskId) ? "Changed name" : "Unchanged name"
       },
       startTime: new Date(payload.startTime) || new Date(),
@@ -116,17 +116,17 @@ export class ReservationController {
   @Returns(404).Description("Not Found")
   deleteReservation(): Reservation {
     return {
-      id: Math.floor(200),
+      id: Math.floor(200).toString(),
       building: {
-        id: 6,
+        id: "qhjdbqkjhdbq",
         name: `building 6`
       },
       room: {
-        id: 2,
+        id: "sqdbqzjhkbqd",
         name: `room 2`
       },
       desk: {
-        id: 4,
+        id: "sdzqdjhqdkhj",
         name: `desk 4`
       },
       startTime: new Date(),

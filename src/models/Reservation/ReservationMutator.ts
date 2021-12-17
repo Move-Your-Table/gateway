@@ -3,15 +3,15 @@ import { Minimum, Property, Required } from "@tsed/schema";
 export default class ReservationConstructor {
     @Property()
     @Minimum(0)
-    buildingId: number;
+    buildingId: string;
 
     @Property()
     @Minimum(0)
-    roomId: number;
+    roomId: string;
 
     @Property()
     @Minimum(0)
-    deskId?: number;
+    deskId?: string;
 
     @Property()
     startTime: Date;

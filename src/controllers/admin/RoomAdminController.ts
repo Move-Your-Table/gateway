@@ -119,19 +119,22 @@ export class RoomAdminController {
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   @Summary("Delete a 🔑-identified room 🧨")
-  DeleteRoom(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number): Room<Reservation> {
+  DeleteRoom(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string
+  ): Room<Reservation> {
     return {
       id: rId,
       buildingId: bId,
       name: `R&D Room ${rId}`,
       type: `R&D Room`,
       incidents: Math.floor(10),
-      features: ["yeet"],
-      capacity: bId,
-      floor: bId,
+      features: ["Research Tools", "Firewall ethernet"],
+      capacity: 3,
+      floor: 3,
       reservations: [
         {
-          id: Math.floor(200),
+          id: Math.floor(200).toString(),
           room: {
             id: rId,
             name: `R&D Room`
@@ -160,9 +163,9 @@ export class RoomAdminController {
   @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
+    bId: string,
     @PathParams("roomId")
-    rId: number,
+    rId: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -174,7 +177,7 @@ export class RoomAdminController {
     const json: Array<Reservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
           id: rId,
           name: `R&D Room`
