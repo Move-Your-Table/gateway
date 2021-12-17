@@ -4,11 +4,11 @@ import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/sc
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import RoomMapper from "../models/Room/RoomMapper";
-import GraphQLService from "src/services/GraphQlService";
+import GraphQLService from "../services/GraphQlService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
-import { fullDateCheck } from "src/helpers/date";
-import Reservation from "src/models/Reservation/Reservation";
+import { fullDateCheck } from "../helpers/date";
+import Reservation from "../models/Reservation/Reservation";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")

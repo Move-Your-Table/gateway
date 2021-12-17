@@ -5,7 +5,7 @@ import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import Building from "../models/Building/Building";
-import BuildingMapper from "src/models/Building/BuildingMapper";
+import BuildingMapper from "../models/Building/BuildingMapper";
 
 @Controller("/buildings")
 @Tags("Buildings")

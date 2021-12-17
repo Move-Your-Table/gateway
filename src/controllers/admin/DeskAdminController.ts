@@ -3,11 +3,14 @@ import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { fullDateCheck } from "../../helpers/date";
+import { DeskController } from "../DeskController";
 import Desk from "../../models/Desks/Desk";
 import DeskConstructor from "../../models/Desks/DeskConstructor";
 import DeskMutator from "../../models/Desks/DeskMutator";
 import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import Reservation from "../../models/Reservation/Reservation";
+import { gql } from "graphql-request";
+import GraphQLService from "../../services/GraphQlService";
 
 @Controller("/admin/building/:buildingId/room/:roomId/desks")
 @Docs("admin-api")
@@ -17,108 +20,23 @@ export class DeskAdminController {
   @Summary("Get all desks with 🔍 detailed reservations")
   @(Returns(200, Array).Of(Desk).Description("OK"))
   @(Returns(404).Description("Not Found"))
-  findAll(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
+  async findAll(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
-  ): Array<Desk<Reservation>> {
-    const json: Array<Desk<Reservation>> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: i,
-        buildingId: bId,
-        roomId: rId,
-        name: `Dual Desk ${i}`,
-        type: `Dual Desk`,
-        incidents: i,
-        features: [
-          `${i} desk lamps`,
-          `Excellent WI-Fi Access`,
-          `LAN ports through FireWire`
-        ],
-        capacity: i,
-        floor: i,
-        reservations: [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: i,
-              name: `Desk ${i}`
-            },
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
-      };
-      json.push(element);
-    }
-    return json
-      .filter((room) => room.name.includes(name || ""))
-      .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
-      .filter((room) => room.type.includes(type || ""));
+  ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
+    return await DeskController.getDesks(bId, rId, name, true);
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🔍 detailed reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number): Desk<Reservation> {
-    return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: dId,
-            name: `Desk ${dId}`
-          },
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: 1,
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
-          }
-        }
-      ]
-    };
+  async findDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string
+  ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
+    return await DeskController.getDesks(bId, rId, dId, true);
   }
 
   @Post()
@@ -126,22 +44,34 @@ export class DeskAdminController {
   @(Returns(201, Desk).Of(Reservation))
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
-  CreateDesk(
+  async CreateDesk(
     @BodyParams() payload: DeskConstructor,
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number
-  ): Desk<Reservation> {
-    return {
-      id: 22,
-      buildingId: bId,
-      roomId: rId,
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string
+  ): Promise<DeskConstructor> {
+    const query = gql`
+      mutation addDesk($buildingId:String!, $roomName:String!, $deskInput:DeskInput!) {
+        addDeskToRoom(buildingId: $buildingId, roomName: $roomName, deskInput: $deskInput) {
+          name
+          features
+        }
+      }
+    `
+
+    const deskInput = {
       name: payload.name,
-      type: payload.type,
-      incidents: 0,
-      features: payload.features,
-      capacity: payload.capacity,
-      floor: payload.floor,
-      reservations: []
+      features: payload.features
+    }
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskInput: deskInput});
+    const desk = result.addDeskToRoom as any;
+    return {
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 
@@ -151,51 +81,37 @@ export class DeskAdminController {
   @(Returns(400).Description("Bad Request"))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  EditDesk(
-    @PathParams("buildingId") bId: number,
-    @PathParams("roomId") rId: number,
-    @PathParams("deskId") dId: number,
+  async EditDesk(
+    @PathParams("buildingId") bId: string,
+    @PathParams("roomId") rId: string,
+    @PathParams("deskId") dId: string,
     @QueryParams("clearIncidents") iClear: boolean,
     @QueryParams("clearReservations") rClear: boolean,
     @BodyParams() payload: DeskMutator
-  ): Desk<Reservation> {
+  ): Promise<DeskConstructor> {
+    const query = gql`
+      mutation updateDesk($buildingId:String!, $roomName:String!, $deskName:String!, $deskInput:DeskInput!) {
+        updateDesk(buildingId: $buildingId, roomName: $roomName, deskName: $deskName, deskInput: $deskInput) {
+          name
+          features
+        }
+      }
+    `
+
+    const deskInput = {
+      name: payload.name,
+      features: payload.features
+    }
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskName: dId, deskInput: deskInput});
+    const desk = result.updateDesk as any;
     return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: payload.name || "Unchanged Desk Name",
-      type: payload.type || "Unchanged type",
-      incidents: iClear ? 0 : 10,
-      features: payload.features || "Unchanged features",
-      capacity: payload.capacity || 10,
-      floor: payload.floor || 1,
-      reservations: rClear
-        ? []
-        : [
-          {
-            id: Math.floor(200),
-            room: {
-              id: rId,
-              name: `R&D Room`
-            },
-            building: {
-              id: bId,
-              name: `The Spire`
-            },
-            desk: {
-              id: rId,
-              name: `Desk ${rId}`
-            },
-            startTime: new Date(),
-            endTime: new Date(),
-            reserved_for: {
-              id: 1,
-              first_name: "JJ",
-              last_name: "Johnson",
-              company: "NB Electronics"
-            }
-          }
-        ]
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 
@@ -204,46 +120,25 @@ export class DeskAdminController {
   @(Returns(200, Desk).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  DeleteDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number,): Desk<Reservation> {
+  async DeleteDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string,): Promise<DeskConstructor> {
+    const query = gql`
+    mutation removeDesk($buildingId:String!, $roomName:String!, $deskName:String!) {
+      removeDesk(buildingId: $buildingId, roomName: $roomName, deskName: $deskName) {
+        name
+        features
+      }
+    }
+  `
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskName: dId});
+    const desk = result.removeDesk as any;
     return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: rId,
-            name: `Desk ${rId}`
-          },
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: 1,
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
-          }
-        }
-      ]
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 

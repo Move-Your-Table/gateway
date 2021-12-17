@@ -1,5 +1,6 @@
 import MaskedReservation from "../Reservation/MaskedReservation";
 import Reservation from "../Reservation/Reservation";
+import ReservationMapper from "../Reservation/ReservationMapper";
 import Room from "./Room";
 
 export default class RoomMapper {
@@ -23,34 +24,8 @@ export default class RoomMapper {
             // This should be done by seperate classes later (DeskMapper and RoomMapper)
             room.desks.forEach((desk : any) => {
                 desk.bookings.forEach((booking : any) => {
-                    const reservation = {
-                        building: {
-                            id: building._id,
-                            name: building.name
-                        },
-                        room: {
-                            id: 0,
-                            name: room.name
-                        },
-                        desk: {
-                            id: 0,
-                            name: desk.name
-                        },
-                        id: booking._id,
-                        startTime: booking.start_time,
-                        endTime: booking.end_time
-                    };
-
-                    if(detailedReservations) {
-                        (reservation as any).reserved_for = {
-                            id: booking.user._id,
-                            first_name: booking.user.first_name,
-                            last_name: booking.user.last_name,
-                            company: booking.user.company,
-                        }
-                    }
-
-                    mappedRoom.reservations.push(reservation);
+                    mappedRoom.reservations
+                    .push(ReservationMapper.mapReservation(building, room, desk, booking));
                 });
             });
 
