@@ -4,7 +4,7 @@ import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/sc
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import RoomMapper from "../models/Room/RoomMapper";
-import GraphQLService from "../services/GraphQlService";
+import GraphQLService from "../services/GraphQLService";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
 import { fullDateCheck } from "../helpers/date";
