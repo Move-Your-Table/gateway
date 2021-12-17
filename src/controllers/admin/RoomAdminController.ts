@@ -57,7 +57,7 @@ export class RoomAdminController {
     `
 
     const roomInput = {
-      name: payload.name,
+      name: payload.roomName,
       type: payload.type,
       floor: payload.floor,
       features: payload.features,
@@ -66,7 +66,7 @@ export class RoomAdminController {
     const result = await GraphQLService.request(query, {id:id, roomInput: roomInput});
     const room = result.addRoom as any;
     return {
-      name: room.name,
+      roomName: room.name,
       type: room.type,
       floor: room.floor,
       features: room.features,
@@ -99,7 +99,7 @@ export class RoomAdminController {
     `
 
     const roomInput = {
-      name: payload.name,
+      name: payload.roomName,
       type: payload.type,
       floor: payload.floor,
       features: payload.features,
@@ -108,7 +108,7 @@ export class RoomAdminController {
     const result = await GraphQLService.request(query, {id:bId, roomName: roomName, roomInput: roomInput});
     const room = result.updateRoom as any;
     return {
-      name: room.name,
+      roomName: room.roomName,
       type: room.type,
       floor: room.floor,
       features: room.features,
@@ -125,7 +125,6 @@ export class RoomAdminController {
     return {
       roomName: roomName,
       buildingId: bId,
-      name: `R&D Room ${roomName}`,
       type: `R&D Room`,
       features: ["yeet"],
       capacity: 0,
@@ -173,29 +172,27 @@ export class RoomAdminController {
     const dayData: Array<number> = day.split("-").map(int => parseInt(int))
     const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
     const json: Array<Reservation> = []
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: Math.floor(200).toString(),
-        room: {
-          id: rId,
-          name: `R&D Room`
-        },
-        building: {
-          id: bId,
-          name: `The Spire`
-        },
-        desk: undefined,
-        startTime: new Date(),
-        endTime: new Date(),
-        reserved_for: {
-          id: "1",
-          first_name: "JJ",
-          last_name: "Johnson",
-          company: "NB Electronics"
-        }
+    const element = {
+      id: Math.floor(200).toString(),
+      room: {
+        id: rId,
+        name: `R&D Room`
+      },
+      building: {
+        id: bId,
+        name: `The Spire`
+      },
+      desk: undefined,
+      startTime: new Date(),
+      endTime: new Date(),
+      reserved_for: {
+        id: "1",
+        first_name: "JJ",
+        last_name: "Johnson",
+        company: "NB Electronics"
       }
-      json.push(element);
-    };
+    }
+    json.push(element);
     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
   }
 }

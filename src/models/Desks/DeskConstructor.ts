@@ -3,7 +3,7 @@ import { Property, Required, Minimum, Example } from "@tsed/schema";
 export default class DeskConstructor {
     @Property()
     @Required()
-    name: string;
+    deskName: string;
 
     @Property()
     @Required()
