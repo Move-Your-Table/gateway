@@ -53,7 +53,7 @@ export class ReservationController {
   @Returns(400).Description("Bad Request")
   @Returns(404).Description("Not Found")
   async CreateReservation(@BodyParams() payload: ReservationMutator): Promise<ReservationConstructor> {
-    console.log("aaa");
+    console.log("START");
     const query = gql`
       mutation addBookingToDesk($id: String!, $roomName: String!, $deskName: String!, $bookingInput: BookingInput!) {
         addBookingToDesk(
@@ -74,7 +74,7 @@ export class ReservationController {
         }
       }
     `
-    console.log(query);
+    // console.log(query);
 
     const bookingInput = {
       user_id: payload.userId,
@@ -82,16 +82,16 @@ export class ReservationController {
       end_time: payload.endTime,
       public: true,
     }
-    console.log(bookingInput);
+    console.log("INPUT", bookingInput);
     const result = await GraphQLService.request(query, {id:payload.buildingId, roomName: payload.roomId, deskName: payload.deskId, bookingInput: bookingInput});
     const reservation = result.addBookingToDesk as any;
-    console.log(reservation);
+    console.log("RESERVATION", reservation);
     return {
-      userId: reservation.user_id,
-      buildingId: reservation.buildingId,
+      userId: reservation.user._id,
+      buildingId: reservation._id,
       startTime: reservation.start_time,
       endTime: reservation.end_time,
-      roomId: reservation.roomId
+      roomId: reservation
     };
   }
 
