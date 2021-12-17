@@ -10,11 +10,9 @@ export default class ReservationMapper {
                 name: building.name
             },
             room: {
-                id: 0,
                 name: room.name
             },
             desk: {
-                id: 0,
                 name: desk.name
             },
             id: booking._id,
@@ -33,5 +31,6 @@ export default class ReservationMapper {
 
         return reservation;
     }
+
 }
   

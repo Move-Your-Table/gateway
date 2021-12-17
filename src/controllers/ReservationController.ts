@@ -1,19 +1,14 @@
 import { Controller } from "@tsed/di";
 import { BodyParams, PathParams, QueryParams } from "@tsed/platform-params";
-import { Delete, Description, Get, Minimum, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Delete, Description, Get, Minimum, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import Reservation from "../models/Reservation/Reservation";
-import ReservationConstructor from "../models/Reservation/ReservationConstructor";
 import ReservationMutator from "../models/Reservation/ReservationMutator";
 import DeleteReservationConstructor from "../models/Reservation/DeleteReservationConstructor";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import ReservationMapper from "../models/Reservation/ReservationMapper";
-import { BuildingController } from "./BuildingController";
-import { RoomController } from "./RoomController";
-import { DeskController } from "./DeskController";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
-import { NotFound } from "@tsed/exceptions";
 
 @Controller("/reservations")
 @Docs("admin-api", "general-api")
@@ -22,35 +17,52 @@ export class ReservationController {
   @Get("/")
   @Summary("Get all reservations of a user")
   @Returns(200, Array).Of(Reservation)
-  getReservations(@QueryParams("userId") @Required() @Minimum(0) id: string): Array<Reservation> {
-    const json: Array<Reservation> = [];
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: (i + 1).toString(),
-        building: {
-          id: (i + 2).toString(),
-          name: `building ${i + 2}`
-        },
-        room: {
-          id: (i + 3).toString(),
-          name: `room ${i + 3}`
-        },
-        desk: {
-          id: (i + 4).toString(),
-          name: `desk ${i + 4}`
-        },
-        startTime: new Date(),
-        endTime: new Date(),
-        reserved_for: {
-          id: id,
-          first_name: "JJ",
-          last_name: "Johnson",
-          company: "NB Electronics"
+  async getReservations(@QueryParams("userId") @Required() @Minimum(0) userId: string): Promise<Array<MaskedReservation | Reservation>> {
+    const query = gql`
+      query getReservations {
+        buildings {
+          _id
+          name
+          rooms {
+            name
+            desks {
+              name
+              bookings(user_id: "61ba0ac1ebca734c1827fbd4") {
+                _id
+                start_time
+                end_time
+                user {
+                  _id
+                  first_name
+                  last_name
+                  company
+                }
+              }
+            }
+          }
         }
       }
-      json.push(element);
-    }
-    return json.filter(item => item.reserved_for.id === id);
+    `
+
+    const result = await GraphQLService.request(query, {user_id: userId});
+    const buildingReservations = result.buildings as any;
+
+    let reservations = [] as Array<MaskedReservation | Reservation>;
+    buildingReservations.forEach((building: any) => {
+      console.log("BUILD", building);
+      building.rooms.forEach((room : any) => {
+        console.log("ROOM", room);
+        room.desks.forEach((desk : any) => {
+          console.log("DESK", desk);
+          desk.bookings.forEach((reservation : any) => {
+            console.log("BOOKING", reservation);
+            reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, true));
+          });
+        });
+      });
+    });
+    return reservations;
+
   }
 
   @Post("/")
