@@ -1,17 +1,8 @@
 image: node:lts
 
-stages:
-  - lint
-  - build
-
 before_script:
   - yarn install --quiet
-lint:
-  stage: lint
-  script:
-    - yarn test:lint
   
-
 production:
   stage: build
   script:
