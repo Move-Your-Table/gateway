@@ -13,7 +13,7 @@ export default class RoomMapper {
 
         building.rooms.forEach((room : any) => {
             const mappedRoom = {
-                name: room.name,
+                roomName: room.name,
                 type: room.type,
                 features: room.features,
                 capacity: room.desks.length,

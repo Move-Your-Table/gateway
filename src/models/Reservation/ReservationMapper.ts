@@ -3,16 +3,18 @@ import Reservation from "./Reservation";
 
 export default class ReservationMapper {
     // Map GraphQL reservation to the correct format for the API
-    static mapReservation(building : any, room : any, desk : any, booking: any, detailedReservations : Boolean = false) : MaskedReservation | Reservation {
+    static mapReservation(building : any, room : any, desk : any, booking: any, detailedReservations : Boolean = false) : MaskedReservation {
         const reservation = {
             building: {
                 id: building._id,
                 name: building.name
             },
             room: {
+                id: room.name,
                 name: room.name
             },
             desk: {
+                id: desk.name,
                 name: desk.name
             },
             id: booking._id,
