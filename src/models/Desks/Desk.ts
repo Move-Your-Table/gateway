@@ -6,18 +6,15 @@ import DeskConstructor from "./DeskConstructor";
 export default class Desk<T> extends DeskConstructor{
     @Property()
     @Required()
-    @Minimum(0)
-    id: number;
+    deskName: string;
 
     @Property()
     @Required()
-    @Minimum(0)
-    buildingId: number;
+    buildingId: string;
 
     @Property()
     @Required()
-    @Minimum(0)
-    roomId: number;
+    roomName: string;
 
     @Property()
     @Minimum(0)

@@ -11,7 +11,7 @@ import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 
-@Controller("/building/:buildingId/room/:roomId/desks")
+@Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
 @Tags("Desks")
 export class DeskController {
@@ -21,12 +21,12 @@ export class DeskController {
   @(Returns(404).Description("Not Found"))
   async findAll(
     @PathParams("buildingId") bId: string,
-    @PathParams("roomId") rId: string,
+    @PathParams("roomName") roomName: string,
     @QueryParams("name") name: string,
     @QueryParams("incidents") showWithIncidents: boolean = true,
     @QueryParams("type") type: string
   ): Promise<Array<Desk<MaskedReservation>>> {
-    const desks = await DeskController.getDesks(bId, rId, name, false);
+    const desks = await DeskController.getDesks(bId, roomName, name, false);
 
     if(desks.length === 0) {
       throw new NotFound("Desks not found.");
@@ -35,12 +35,12 @@ export class DeskController {
     }
   }
 
-  @Get("/:deskId")
+  @Get("/:deskName")
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string): Promise<Desk<MaskedReservation>> {
-    const desks = await DeskController.getDesks(bId, rId, dId, false);
+  async findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") roomName: string, @PathParams("deskName") deskName: string): Promise<Desk<MaskedReservation>> {
+    const desks = await DeskController.getDesks(bId, roomName, deskName, false);
 
     if(desks.length === 0) {
       throw new NotFound("Desks not found.");
@@ -49,17 +49,17 @@ export class DeskController {
     }
   }
 
-  @Get("/:deskId/reservations")
+  @Get("/:deskName/reservations")
   @Summary("Get 🎭 reservations of a 🔑-identified desk")
   @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
   getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: number,
-    @PathParams("roomId")
-    rId: number,
-    @PathParams("deskId")
-    dId: number,
+    bId: string,
+    @PathParams("roomName")
+    roomName: string,
+    @PathParams("deskName")
+    deskName: string,
     @QueryParams("day")
     @Required()
     @Example("yyyy-MM-dd")
@@ -71,9 +71,9 @@ export class DeskController {
     const json: Array<MaskedReservation> = []
     for (let i = 0; i < 10; i++) {
       const element = {
-        id: Math.floor(200),
+        id: Math.floor(200).toString(),
         room: {
-          id: rId,
+          id: roomName,
           name: `R&D Room`
         },
         building: {
@@ -81,7 +81,7 @@ export class DeskController {
           name: `The Spire`
         },
         desk: {
-          id: i,
+          id: deskName,
           name: `Desk ${i}`
         },
         startTime: new Date(),
