@@ -8,10 +8,6 @@ import RoomConstructor from "./RoomConstructor";
 export default class Room<T> extends RoomConstructor {
   @Property()
   @Required()
-  roomName: string;
-
-  @Property()
-  @Required()
   buildingId: string;
 
   @Property()

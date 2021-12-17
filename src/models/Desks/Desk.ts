@@ -7,10 +7,6 @@ import DeskConstructor from "./DeskConstructor";
 export default class Desk<T> extends DeskConstructor{
     @Property()
     @Required()
-    deskName: string;
-
-    @Property()
-    @Required()
     buildingId: string;
 
     @Property()
