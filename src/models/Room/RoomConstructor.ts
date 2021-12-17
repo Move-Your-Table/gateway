@@ -3,10 +3,6 @@ import { Property, Required, Minimum, Example } from "@tsed/schema";
 export default class RoomConstructor {
   @Property()
   @Required()
-  name: string;
-
-  @Property()
-  @Required()
   type: string;
 
   @Property()
