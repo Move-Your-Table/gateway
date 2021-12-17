@@ -1,13 +1,15 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
-import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Example, Format, Get, Required, Returns, string, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
 import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQlService";
 import DeskMapper from "../models/Desks/DeskMapper";
+import { fullDateCheck } from "../helpers/date";
+import Building from "../models/Building/Building";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -26,10 +28,10 @@ export class DeskController {
   ): Promise<Array<Desk<MaskedReservation>>> {
     const query = gql`
     query{
-      building(id: "61b9ee2068ded859109fdc82"){
+      building(id: "${bId}"){
         name,
         _id
-        rooms(name: "Room 1"){
+        rooms(name: "${rId}"){
           name,
           desks{
             name,
@@ -44,25 +46,29 @@ export class DeskController {
       }
     }`
     return GraphQLService.request(query)
-      .then((response) => { 
-        return response.building.rooms[0].desks
-          .map(
-            (desk: Array<any>) => DeskMapper.mapDesk(bId, rId, desk)
-          )
+      .then((response) => {
+        if (response.errors) {throw new NotFound("Building not found")}
+        if (response.building.rooms.length === 0) { throw new NotFound("Room not found")}
+        return response.building.rooms[0].desks.map((desk: Array<any>) => DeskMapper.mapDesk(bId, rId, desk))
       })
       .then((response: Array<Desk<MaskedReservation>>) => { 
-        return response.filter((room) => room.name.includes(name || ""))
+        return response
+          .filter((room) => room.name.includes(name || ""))
           .filter((room) => (showWithIncidents ? room.incidents >= 0 : room.incidents === 0))
           .filter((room) => room.type.includes(type || ""));
+      }).catch((err) => { 
+        if (err.message.includes("Cast to ObjectId")) { 
+          throw new NotFound("Building not found")
+        }
+        throw new InternalServerError("Something went wrong")
       })
-      
   }
 
   @Get("/:deskId")
   @Summary("Get a 🔑-identified desk with 🎭 reservations")
   @(Returns(200, Desk).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  findRoom(@PathParams("buildingId") bId: number, @PathParams("roomName") rId: number, @PathParams("deskId") dId: number): Desk<MaskedReservation> {
+  findRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") rId: string, @PathParams("deskId") dId: string): Desk<MaskedReservation> {
     return {
       id: dId,
       buildingId: bId,
