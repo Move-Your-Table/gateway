@@ -53,6 +53,7 @@ export class DeskAdminController {
       mutation addDesk($buildingId:String!, $roomName:String!, $deskInput:DeskInput!) {
         addDeskToRoom(buildingId: $buildingId, roomName: $roomName, deskInput: $deskInput) {
           name
+          features
         }
       }
     `
@@ -133,46 +134,25 @@ export class DeskAdminController {
   @(Returns(200, Desk).Of(Reservation))
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
-  DeleteDesk(@PathParams("buildingId") bId: number, @PathParams("roomId") rId: number, @PathParams("deskId") dId: number,): Desk<Reservation> {
+  async DeleteDesk(@PathParams("buildingId") bId: string, @PathParams("roomId") rId: string, @PathParams("deskId") dId: string,): Promise<DeskConstructor> {
+    const query = gql`
+    mutation removeDesk($buildingId:String!, $roomName:String!, $deskName:String!) {
+      removeDesk(buildingId: $buildingId, roomName: $roomName, deskName: $deskName) {
+        name
+        features
+      }
+    }
+  `
+
+    const result = await GraphQLService.request(query, 
+      {buildingId:bId, roomName: rId, deskName: dId});
+    const desk = result.removeDesk as any;
     return {
-      id: dId,
-      buildingId: bId,
-      roomId: rId,
-      name: `Dual Desk ${dId}`,
-      type: `Dual Desk`,
-      incidents: dId,
-      features: [
-        `${dId} desk lamps`,
-        `Excellent WI-Fi Access`,
-        `LAN ports through FireWire`
-      ],
-      capacity: dId,
-      floor: dId,
-      reservations: [
-        {
-          id: Math.floor(200),
-          room: {
-            id: rId,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: {
-            id: rId,
-            name: `Desk ${rId}`
-          },
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: 1,
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
-          }
-        }
-      ]
+      name: desk.name,
+      features: desk.features,
+      type: "normal",
+      floor: 0,
+      capacity: 0
     };
   }
 
