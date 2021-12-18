@@ -154,45 +154,45 @@ export class RoomAdminController {
     };
   }
 
-  @Get("/:roomName/reservations")
-  @(Returns(200, Array).Of(Reservation))
-  @(Returns(404).Description("Not Found"))
-  @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
-  getReservationsPerRoom(
-    @PathParams("buildingId")
-    bId: string,
-    @PathParams("roomName")
-    rId: string,
-    @QueryParams("day")
-    @Required()
-    @Example("yyyy-MM-dd")
-    @Format("regex")
-    day: string
-  ): Array<Reservation> {
-    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
-    const json: Array<Reservation> = []
-    const element = {
-      id: Math.floor(200).toString(),
-      room: {
-        id: rId,
-        name: `R&D Room`
-      },
-      building: {
-        id: bId,
-        name: `The Spire`
-      },
-      desk: undefined,
-      startTime: new Date(),
-      endTime: new Date(),
-      reserved_for: {
-        id: "1",
-        first_name: "JJ",
-        last_name: "Johnson",
-        company: "NB Electronics"
-      }
-    }
-    json.push(element);
-    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
-  }
+//   @Get("/:roomName/reservations")
+//   @(Returns(200, Array).Of(Reservation))
+//   @(Returns(404).Description("Not Found"))
+//   @Summary("Get 🔍 detailed reservations of a 🔑-identified room")
+//   getReservationsPerRoom(
+//     @PathParams("buildingId")
+//     bId: string,
+//     @PathParams("roomName")
+//     rId: string,
+//     @QueryParams("day")
+//     @Required()
+//     @Example("yyyy-MM-dd")
+//     @Format("regex")
+//     day: string
+//   ): Array<Reservation> {
+//     const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+//     const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
+//     const json: Array<Reservation> = []
+//     const element = {
+//       id: Math.floor(200).toString(),
+//       room: {
+//         id: rId,
+//         name: `R&D Room`
+//       },
+//       building: {
+//         id: bId,
+//         name: `The Spire`
+//       },
+//       desk: undefined,
+//       startTime: new Date(),
+//       endTime: new Date(),
+//       reserved_for: {
+//         id: "1",
+//         first_name: "JJ",
+//         last_name: "Johnson",
+//         company: "NB Electronics"
+//       }
+//     }
+//     json.push(element);
+//     return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+//   }
 }
