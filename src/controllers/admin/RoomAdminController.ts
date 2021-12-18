@@ -189,9 +189,7 @@ export class RoomAdminController {
       const buildingRes = await GraphQLService.request(buildingQuery, {id: buildingId, roomName: roomName});
       const building = buildingRes.building as any;
 
-      console.log("BUILD", building);
       let room = building.rooms[0];
-      console.log("ROOM", room);
 
       let reservations = [] as Array<MaskedReservation | Reservation>;
       building.rooms.forEach((room : any) => {
