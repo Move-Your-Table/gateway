@@ -17,6 +17,7 @@ export default class DeskMapper {
                 const mappedDesk = {
                     name: desk.name,
                     type: "normal",
+                    features: desk.features,
                     capacity: room.deskCount,
                     floor: room.floor,
                     buildingId: building._id,
