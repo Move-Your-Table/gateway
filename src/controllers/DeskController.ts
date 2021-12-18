@@ -10,6 +10,7 @@ import GraphQLService from "../services/GraphQLService";
 import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
+import ReservationMapper from "src/models/Reservation/ReservationMapper";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -57,21 +58,20 @@ export class DeskController {
   @Summary("Get 🎭 reservations of a 🔑-identified desk")
   @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  getReservationsPerRoom(
+  async getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: string,
+    buildingId: string,
     @PathParams("roomName")
     roomName: string,
     @PathParams("deskName")
     deskName: string,
     @QueryParams("day")
-    @Required()
     @Example("yyyy-MM-dd")
     @Format("regex")
     day: string
   ): Promise<Array<MaskedReservation>> {
     const query = gql`
-    query getDeskReservations($id: String!, $roomName: String!, $deskName: String!) {
+    query getDeskReservations($id: String!, $roomName: String!, $deskName: String!, $date: DateTime) {
       building(id: $id) {
         _id
         name
@@ -79,7 +79,7 @@ export class DeskController {
           name
           desks(name: $deskName) {
             name
-            bookings(before: "2021-12-17") {
+            bookings(at: $date) {
               _id
               start_time
               end_time
@@ -89,8 +89,24 @@ export class DeskController {
       }
     }   
     `;
-    
 
+    try {
+      const result = await GraphQLService.request(query, {id: buildingId, roomName: roomName, deskName: deskName, date: day});
+      const deskReservations = result as any;
+
+      let reservations = [] as Array<MaskedReservation>;
+      const building = deskReservations.building;
+      const room = building.rooms[0];
+      const desk = room.desks[0];
+
+      desk.bookings.forEach((reservation : any) => {
+        reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, false));
+      });
+
+      return reservations;
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   static async getDesks(buildingId: string, 
