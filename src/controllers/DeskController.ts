@@ -70,6 +70,14 @@ export class DeskController {
     @Format("regex")
     day: string
   ): Promise<Array<MaskedReservation>> {
+    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2]);
+
+    // If date object is invalid it will return NaN. NaN is never equal to itself
+    if(refDate.getTime() !== refDate.getTime()) {
+      throw new InternalServerError("The given date is invalid");
+    }
+  
     const query = gql`
     query getDeskReservations($id: String!, $roomName: String!, $deskName: String!, $date: DateTime) {
       building(id: $id) {
@@ -91,7 +99,7 @@ export class DeskController {
     `;
 
     try {
-      const result = await GraphQLService.request(query, {id: buildingId, roomName: roomName, deskName: deskName, date: day});
+      const result = await GraphQLService.request(query, {id: buildingId, roomName: roomName, deskName: deskName, date: refDate});
       const deskReservations = result as any;
 
       let reservations = [] as Array<MaskedReservation>;
