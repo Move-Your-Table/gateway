@@ -8,6 +8,7 @@ import Building from "../../models/Building/Building";
 import BuildingConstructor from "../../models/Building/BuildingConstructor";
 import BuildingMutator from "../../models/Building/BuildingMutator";
 import BuildingMapper from "../../models/Building/BuildingMapper";
+import { InternalServerError } from "@tsed/exceptions";
 
 @Controller("/admin/building")
 @Tags("Buildings")
@@ -45,15 +46,19 @@ export class BuildingAdminController {
       }
     }
 
-    const result = await GraphQLService.request(query, {buildingInput: buildingInput});
-    const building = result.addBuilding as any;
-    return {
-      street: building.address.street,
-      city: building.address.city,
-      postcode: building.address.postalcode,
-      country: building.address.country,
-      name: building.name,
-      id: building._id
+    try {
+      const result = await GraphQLService.request(query, {buildingInput: buildingInput});
+      const building = result.addBuilding as any;
+      return {
+        street: building.address.street,
+        city: building.address.city,
+        postcode: building.address.postalcode,
+        country: building.address.country,
+        name: building.name,
+        id: building._id
+      }
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
     }
   }
 
@@ -91,9 +96,13 @@ export class BuildingAdminController {
       }
     };
 
-    const result = await GraphQLService.request(query, {id: id, buildingInput: buildingInput});
-    const building = result.updateBuilding as any;
-    return BuildingMapper.mapBuilding(building);
+    try {
+      const result = await GraphQLService.request(query, {id: id, buildingInput: buildingInput});
+      const building = result.updateBuilding as any;
+      return BuildingMapper.mapBuilding(building);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   @Delete("/:id")
@@ -118,8 +127,12 @@ export class BuildingAdminController {
     }
     `
 
-    const result = await GraphQLService.request(query, {id: id});
-    const building = result.deleteBuilding as any;
-    return BuildingMapper.mapBuilding(building);
+    try {
+      const result = await GraphQLService.request(query, {id: id});
+      const building = result.deleteBuilding as any;
+      return BuildingMapper.mapBuilding(building);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }
