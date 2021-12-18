@@ -2,7 +2,6 @@ import { BodyParams, PathParams, QueryParams } from "@tsed/common";
 import { Controller } from "@tsed/di";
 import { Delete, Example, Format, Get, Patch, Post, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
-import { fullDateCheck } from "../../helpers/date";
 import { DeskController } from "../DeskController";
 import Desk from "../../models/Desks/Desk";
 import DeskConstructor from "../../models/Desks/DeskConstructor";
@@ -12,6 +11,7 @@ import Reservation from "../../models/Reservation/Reservation";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
 import { InternalServerError, NotFound } from "@tsed/exceptions";
+import ReservationMapper from "src/models/Reservation/ReservationMapper";
 
 @Controller("/admin/building/:buildingId/room/:roomName/desks")
 @Docs("admin-api")
@@ -164,47 +164,69 @@ export class DeskAdminController {
   @(Returns(200, Array).Of(Reservation))
   @(Returns(404).Description("Not Found"))
   @Summary("Get 🔍 detailed reservations of a 🔑-identified desk")
-  getReservationsPerRoom(
-    @PathParams("buildingId")
-    bId: string,
-    @PathParams("roomName")
-    rId: string,
-    @PathParams("deskName") deskName: number,
+  async getReservationsPerRoom(
+    @PathParams("buildingId") buildingId: string,
+    @PathParams("roomName") roomName: string,
+    @PathParams("deskName") deskName: string,
     @QueryParams("day")
-    @Required()
     @Example("yyyy-MM-dd")
     @Format("regex")
     day: string
-  ): Array<Reservation> {
-    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
-    const json: Array<Reservation> = []
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: Math.floor(200).toString(),
-        room: {
-          id: rId,
-          name: `R&D Room`
-        },
-        building: {
-          id: bId,
-          name: `The Spire`
-        },
-        desk: {
-          id: rId,
-          name: `Desk ${rId}`
-        },
-        startTime: new Date(),
-        endTime: new Date(),
-        reserved_for: {
-          id: "1",
-          first_name: "JJ",
-          last_name: "Johnson",
-          company: "NB Electronics"
+  ): Promise<Array<MaskedReservation>> {
+    
+    let refDate;
+    if(day) {
+      const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+      refDate = new Date(dayData[0], dayData[1], dayData[2]);
+
+      // If date object is invalid it will return NaN. NaN is never equal to itself
+      if(refDate.getTime() !== refDate.getTime()) {
+        throw new InternalServerError("The given date is invalid");
+      }
+    }
+    
+    const query = gql`
+    query getDeskReservations($id: String!, $roomName: String!, $deskName: String!, $date: DateTime) {
+      building(id: $id) {
+        _id
+        name
+        rooms(name: $roomName){
+          name
+          desks(name: $deskName) {
+            name
+            bookings(at: $date) {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
+          }
         }
       }
-      json.push(element);
-    };
-    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+    }   
+    `;
+
+    try {
+      const result = await GraphQLService.request(query, {id: buildingId, roomName: roomName, deskName: deskName, date: refDate});
+      const deskReservations = result as any;
+
+      let reservations = [] as Array<MaskedReservation>;
+      const building = deskReservations.building;
+      const room = building.rooms[0];
+      const desk = room.desks[0];
+
+      desk.bookings.forEach((reservation : any) => {
+        reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, true));
+      });
+
+      return reservations;
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }
