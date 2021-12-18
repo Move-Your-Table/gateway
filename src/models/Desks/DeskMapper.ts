@@ -9,7 +9,7 @@ export default class DeskMapper {
     static mapDesks(building : any, 
         detailedReservations : Boolean = false,
         incidentReports : Boolean = false) : Array<Desk<MaskedReservation>> {
-        const desks = Array<Desk<MaskedReservation | Reservation>>();
+        let desks = Array<Desk<MaskedReservation | Reservation>>();
 
         // Put all the desks of every room into the desks array
         building.rooms.forEach((room : any) => {
@@ -40,7 +40,7 @@ export default class DeskMapper {
                 
                 return mappedDesk;
             });
-            desks.push(roomDesks);
+            desks = desks.concat(roomDesks);
         });
         return desks;
     }
