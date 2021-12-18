@@ -128,6 +128,7 @@ export class DeskController {
     query getDesks($buildingId:String!, $roomName:String!, $deskName:String) {
       building(id:$buildingId) {
         _id
+        name
         rooms(name:$roomName) {
           name
           desks(name:$deskName) {
