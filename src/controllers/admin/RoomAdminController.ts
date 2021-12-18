@@ -11,6 +11,7 @@ import { RoomController } from "../RoomController";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
 import { InternalServerError, NotFound } from "@tsed/exceptions";
+import ReservationMapper from "../../models/Reservation/ReservationMapper";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
@@ -134,36 +135,86 @@ export class RoomAdminController {
   @(Returns(403).Description("Unauthorized"))
   @(Returns(404).Description("Not Found"))
   @Summary("Delete a 🔑-identified room 🧨")
-  DeleteRoom(@PathParams("buildingId") bId: string, @PathParams("roomName") roomName: string): Room<Reservation> {
-    return {
-      roomName: roomName,
-      buildingId: bId,
-      type: `R&D Room`,
-      features: ["yeet"],
-      capacity: 0,
-      floor: 0,
-      reservations: [
-        {
-          id: Math.floor(200).toString(),
-          room: {
-            id: roomName,
-            name: `R&D Room`
-          },
-          building: {
-            id: bId,
-            name: `The Spire`
-          },
-          desk: undefined,
-          startTime: new Date(),
-          endTime: new Date(),
-          reserved_for: {
-            id: "1",
-            first_name: "JJ",
-            last_name: "Johnson",
-            company: "NB Electronics"
+  async DeleteRoom(@PathParams("buildingId") buildingId: string, @PathParams("roomName") roomName: string)
+  : Promise<any> {
+
+    const buildingQuery = gql`
+    query getSpecificBuilding($id: String!, $roomName: String!) {
+      building(id: $id) {
+        _id
+        name
+        address {
+          street
+          city
+          postalcode
+          country
+        }
+        rooms(name: $roomName){
+          name
+          deskCount  
+          type
+          floor
+          features
+          desks {
+            name
+            bookings {
+              _id
+              start_time
+              end_time
+              user {
+                _id
+                first_name
+                last_name
+                company
+              }
+            }
           }
         }
-      ]
-    };
+      }
+    }
+    `;
+
+    const deleteRoomQuery = gql`
+    mutation deleteroom($id: String!, $roomName: String!) {
+      removeRoom (
+        buildingId: $id,
+        roomName: $roomName
+      ) {
+        name
+      }
+    }
+    `;
+
+    try {
+      const buildingRes = await GraphQLService.request(buildingQuery, {id: buildingId, roomName: roomName});
+      const building = buildingRes.building as any;
+
+      let room = building.rooms[0];
+
+      let reservations = [] as Array<MaskedReservation | Reservation>;
+      building.rooms.forEach((room : any) => {
+          room.desks.forEach((desk : any) => {
+            desk.bookings.forEach((reservation : any) => {
+              reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, true));
+          });
+        });
+      });
+
+      await GraphQLService.request(deleteRoomQuery, {id:buildingId, roomName: roomName});
+
+      return {
+        roomName: room.name,
+        type: room.type,
+        floor: room.floor,
+        features: room.features,
+        capacity: 0,
+        buildingId: buildingId,
+        reservations: reservations
+      };
+
+
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }
