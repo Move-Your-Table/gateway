@@ -11,6 +11,7 @@ import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import Reservation from "../../models/Reservation/Reservation";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
+import { InternalServerError } from "@tsed/exceptions";
 
 @Controller("/admin/building/:buildingId/room/:roomName/desks")
 @Docs("admin-api")
@@ -66,16 +67,20 @@ export class DeskAdminController {
       features: payload.features
     }
 
-    const result = await GraphQLService.request(query, 
-      {buildingId:bId, roomName: roomName, deskInput: deskInput});
-    const desk = result.addDeskToRoom as any;
-    return {
-      deskName: desk.name,
-      features: desk.features,
-      type: "normal",
-      floor: 0,
-      capacity: 0
-    };
+    try {
+      const result = await GraphQLService.request(query, 
+        {buildingId:bId, roomName: roomName, deskInput: deskInput});
+      const desk = result.addDeskToRoom as any;
+      return {
+        deskName: desk.name,
+        features: desk.features,
+        type: "normal",
+        floor: 0,
+        capacity: 0
+      };
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   @Patch("/:deskName")
@@ -133,16 +138,20 @@ export class DeskAdminController {
     }
   `
 
-    const result = await GraphQLService.request(query, 
-      {buildingId:bId, roomName: roomName, deskName: deskName});
-    const desk = result.removeDesk as any;
-    return {
-      deskName: desk.name,
-      features: desk.features,
-      type: "normal",
-      floor: 0,
-      capacity: 0
-    };
+    try {
+      const result = await GraphQLService.request(query, 
+        {buildingId:bId, roomName: roomName, deskName: deskName});
+      const desk = result.removeDesk as any;
+      return {
+        deskName: desk.name,
+        features: desk.features,
+        type: "normal",
+        floor: 0,
+        capacity: 0
+      };
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   @Get("/:deskName/reservations")

@@ -1,6 +1,6 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
-import { NotFound } from "@tsed/exceptions";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
@@ -135,9 +135,13 @@ export class DeskController {
     }
     `
 
-    const result = await GraphQLService.request(query, 
-      {buildingId: buildingId, roomName: roomName, deskName: deskName});
-    const building = result.building as any;
-    return DeskMapper.mapDesks(building, detailedReservations, incidentReports);
+    try {
+      const result = await GraphQLService.request(query, 
+        {buildingId: buildingId, roomName: roomName, deskName: deskName});
+      const building = result.building as any;
+      return DeskMapper.mapDesks(building, detailedReservations, incidentReports);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }

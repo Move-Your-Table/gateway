@@ -11,6 +11,7 @@ import RoomMutator from "../../models/Room/RoomMutator";
 import { RoomController } from "../RoomController";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
+import { InternalServerError } from "@tsed/exceptions";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
@@ -63,15 +64,19 @@ export class RoomAdminController {
       features: payload.features,
     }
 
-    const result = await GraphQLService.request(query, {id:id, roomInput: roomInput});
-    const room = result.addRoom as any;
-    return {
-      roomName: room.name,
-      type: room.type,
-      floor: room.floor,
-      features: room.features,
-      capacity: 0
-    };
+    try {
+      const result = await GraphQLService.request(query, {id:id, roomInput: roomInput});
+      const room = result.addRoom as any;
+      return {
+        roomName: room.name,
+        type: room.type,
+        floor: room.floor,
+        features: room.features,
+        capacity: 0
+      };
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   @Patch("/:roomName")
@@ -105,15 +110,19 @@ export class RoomAdminController {
       features: payload.features,
     }
 
-    const result = await GraphQLService.request(query, {id:bId, roomName: roomName, roomInput: roomInput});
-    const room = result.updateRoom as any;
-    return {
-      roomName: room.roomName,
-      type: room.type,
-      floor: room.floor,
-      features: room.features,
-      capacity: 0
-    };
+    try {
+      const result = await GraphQLService.request(query, {id:bId, roomName: roomName, roomInput: roomInput});
+      const room = result.updateRoom as any;
+      return {
+        roomName: room.roomName,
+        type: room.type,
+        floor: room.floor,
+        features: room.features,
+        capacity: 0
+      };
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   @Delete("/:roomName")

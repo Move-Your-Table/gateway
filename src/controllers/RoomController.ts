@@ -9,6 +9,7 @@ import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
 import { fullDateCheck } from "../helpers/date";
 import Reservation from "../models/Reservation/Reservation";
+import { InternalServerError } from "@tsed/exceptions";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")
@@ -123,9 +124,13 @@ export class RoomController {
     }
     `
 
-    const result = await GraphQLService.request(query, {id: buildingId, name: roomName, type: type});
-    const building = result.building as any;
-    return RoomMapper.mapRooms(building, detailedReservations, incidentReports);
+    try {
+      const result = await GraphQLService.request(query, {id: buildingId, name: roomName, type: type});
+      const building = result.building as any;
+      return RoomMapper.mapRooms(building, detailedReservations, incidentReports);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }
 
