@@ -9,6 +9,7 @@ import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQLService";
 import ReservationMapper from "../models/Reservation/ReservationMapper";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
+import { InternalServerError } from "@tsed/exceptions";
 
 @Controller("/reservations")
 @Docs("admin-api", "general-api")
@@ -43,25 +44,24 @@ export class ReservationController {
         }
       }
     `
+    try {
+      const result = await GraphQLService.request(query, {userId: userId});
+      const buildingReservations = result.buildings as any;
 
-    const result = await GraphQLService.request(query, {userId: userId});
-    const buildingReservations = result.buildings as any;
-
-    let reservations = [] as Array<MaskedReservation | Reservation>;
-    buildingReservations.forEach((building: any) => {
-      console.log("BUILD", building);
-      building.rooms.forEach((room : any) => {
-        console.log("ROOM", room);
-        room.desks.forEach((desk : any) => {
-          console.log("DESK", desk);
-          desk.bookings.forEach((reservation : any) => {
-            console.log("BOOKING", reservation);
-            reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, true));
+      let reservations = [] as Array<MaskedReservation | Reservation>;
+      buildingReservations.forEach((building: any) => {
+        building.rooms.forEach((room : any) => {
+          room.desks.forEach((desk : any) => {
+            desk.bookings.forEach((reservation : any) => {
+              reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, true));
+            });
           });
         });
       });
-    });
-    return reservations;
+      return reservations;
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
 
   }
 
@@ -113,25 +113,28 @@ export class ReservationController {
         }
       }
     `
+    try {
+      const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
+      const building = buildingRes.building as any;
+      
+      let rooms = building.rooms;
 
-    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
-    const building = buildingRes.building as any;
-    
-    let rooms = building.rooms;
+      let room = rooms[0];
+      let desk = room.desks[0];
 
-    let room = rooms[0];
-    let desk = room.desks[0];
+      const bookingInput = {
+        user_id: payload.userId,
+        start_time: payload.startTime,
+        end_time: payload.endTime,
+        public: true,
+      }
+      const result = await GraphQLService.request(reservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingInput: bookingInput});
+      const reservation = result.addBookingToDesk as any;
 
-    const bookingInput = {
-      user_id: payload.userId,
-      start_time: payload.startTime,
-      end_time: payload.endTime,
-      public: true,
+      return ReservationMapper.mapReservation(building, room, desk, reservation, true);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
     }
-    const result = await GraphQLService.request(reservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingInput: bookingInput});
-    const reservation = result.addBookingToDesk as any;
-
-    return ReservationMapper.mapReservation(building, room, desk, reservation, true);
   }
 
   @Delete("/:reservationId")
@@ -177,19 +180,21 @@ export class ReservationController {
         }
       }
     `
+    try {
+      const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
+      const building = buildingRes.building as any;
 
-    const buildingRes = await GraphQLService.request(buildingQuery, {id: payload.buildingId, roomName: payload.roomName, deskName: payload.deskName});
-    const building = buildingRes.building as any;
+      let rooms = building.rooms;
 
-    let rooms = building.rooms;
+      let room = rooms[0];
+      let desk = room.desks[0];
 
-    let room = rooms[0];
-    let desk = room.desks[0];
+      const result = await GraphQLService.request(deleteReservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingId: reservationId});
+      const reservation = result.cancelBookingFromDesk as any;
 
-    const result = await GraphQLService.request(deleteReservationQuery, {id:payload.buildingId, roomName: payload.roomName, deskName: payload.deskName, bookingId: reservationId});
-    const reservation = result.cancelBookingFromDesk as any;
-
-    return ReservationMapper.mapReservation(building, room, desk, reservation, true);
-
+      return ReservationMapper.mapReservation(building, room, desk, reservation, true);
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 }
