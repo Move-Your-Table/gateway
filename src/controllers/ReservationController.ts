@@ -142,7 +142,6 @@ export class ReservationController {
   @Returns(200, Reservation)
   @Returns(404).Description("Not Found")
   async deleteReservation(@PathParams("reservationId") reservationId: string, @BodyParams() payload: DeleteReservationConstructor): Promise<MaskedReservation | Reservation> {
-    console.log("DELETING");
     const deleteReservationQuery = gql`
     mutation deleteReservation($id: String!, $roomName: String!, $deskName: String!, $bookingId: String!) {
       cancelBookingFromDesk(
