@@ -69,12 +69,16 @@ export class DeskController {
     @Format("regex")
     day: string
   ): Promise<Array<MaskedReservation>> {
-    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2]);
+    
+    let refDate;
+    if(day) {
+      const dayData: Array<number> = day.split("-").map(int => parseInt(int))
+      refDate = new Date(dayData[0], dayData[1], dayData[2]);
 
-    // If date object is invalid it will return NaN. NaN is never equal to itself
-    if(refDate.getTime() !== refDate.getTime()) {
-      throw new InternalServerError("The given date is invalid");
+      // If date object is invalid it will return NaN. NaN is never equal to itself
+      if(refDate.getTime() !== refDate.getTime()) {
+        throw new InternalServerError("The given date is invalid");
+      }
     }
   
     const query = gql`
