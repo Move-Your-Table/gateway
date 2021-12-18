@@ -15,7 +15,7 @@ export default class DeskMapper {
         building.rooms.forEach((room : any) => {
             const roomDesks = room.desks.map((desk: any) => {
                 const mappedDesk = {
-                    name: desk.name,
+                    deskName: desk.name,
                     type: "normal",
                     features: desk.features,
                     capacity: room.deskCount,
