@@ -128,6 +128,7 @@ export class DeskController {
           name
           desks(name:$deskName) {
             name
+            features
             incidentReports {
               _id
               message
