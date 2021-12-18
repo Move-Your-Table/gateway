@@ -9,7 +9,7 @@ import MaskedReservation from "../models/Reservation/MaskedReservation";
 import Room from "../models/Room/Room";
 import { fullDateCheck } from "../helpers/date";
 import Reservation from "../models/Reservation/Reservation";
-import { InternalServerError } from "@tsed/exceptions";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 
 @Controller("/building/:buildingId/room")
 @Docs("general-api")
@@ -39,7 +39,7 @@ export class RoomController {
     const rooms = await RoomController.getRooms(bId, false, showWithIncidents, roomName);
 
     if(rooms.length === 0) {
-      return null;
+      throw new NotFound("Desks not found.");
     } else {
       return rooms[0];
     }

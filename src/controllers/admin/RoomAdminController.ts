@@ -11,7 +11,7 @@ import RoomMutator from "../../models/Room/RoomMutator";
 import { RoomController } from "../RoomController";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
-import { InternalServerError } from "@tsed/exceptions";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
@@ -36,8 +36,13 @@ export class RoomAdminController {
   @Summary("Get a 🔑-identified room with 🔍 detailed reservations")
   async findRoom(@PathParams("buildingId") bId: string, 
   @PathParams("roomName") roomName: string,
-  @QueryParams("incidents") showWithIncidents: boolean = false,): Promise<Array<Room<MaskedReservation|Reservation>>> {
-    return await RoomController.getRooms(bId, true, showWithIncidents, roomName);
+  @QueryParams("incidents") showWithIncidents: boolean = false,): Promise<Room<MaskedReservation|Reservation>> {
+   const rooms = await RoomController.getRooms(bId, true, showWithIncidents, roomName);
+    if(rooms.length === 0) {
+      throw new NotFound("Desks not found.");
+    } else {
+      return rooms[0];
+    }
   }
 
   @Post()
