@@ -69,31 +69,28 @@ export class DeskController {
     @Example("yyyy-MM-dd")
     @Format("regex")
     day: string
-  ): Array<MaskedReservation> {
-    const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
-    const json: Array<MaskedReservation> = []
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: Math.floor(200).toString(),
-        room: {
-          id: roomName,
-          name: `R&D Room`
-        },
-        building: {
-          id: bId,
-          name: `The Spire`
-        },
-        desk: {
-          id: deskName,
-          name: `Desk ${i}`
-        },
-        startTime: new Date(),
-        endTime: new Date()
+  ): Promise<Array<MaskedReservation>> {
+    const query = gql`
+    query getDeskReservations($id: String!, $roomName: String!, $deskName: String!) {
+      building(id: $id) {
+        _id
+        name
+        rooms(name: $roomName){
+          name
+          desks(name: $deskName) {
+            name
+            bookings(before: "2021-12-17") {
+              _id
+              start_time
+              end_time
+            }
+          }
+        }
       }
-      json.push(element);
-    };
-    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+    }   
+    `;
+    
+
   }
 
   static async getDesks(buildingId: string, 
