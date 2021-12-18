@@ -21,7 +21,7 @@ export default class DeskMapper {
                     capacity: room.deskCount,
                     floor: room.floor,
                     buildingId: building._id,
-                    roomId: room.name,
+                    roomName: room.name,
                     incidents: desk.incidentReports.length,
                     reservations: new Array<MaskedReservation>()
                 };
