@@ -41,7 +41,7 @@ export class DeskAdminController {
   @QueryParams("incidents") showWithIncidents: boolean = false,
   ): Promise<Desk<MaskedReservation|Reservation>> {
     const desks = await DeskController.getDesks(bId, roomName, deskName, true, showWithIncidents);
-    console.log(desks);
+
     if(desks.length === 0) {
       throw new NotFound("Desk not found.");
     } else {
