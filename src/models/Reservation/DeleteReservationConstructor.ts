@@ -1,10 +1,6 @@
 import { Minimum, Property, Required } from "@tsed/schema";
 
-export default class ReservationConstructor {
-    @Property()
-    @Required()
-    userId: string;
-
+export default class DeleteReservationConstructor {
     @Property()
     @Required()
     buildingId: string;
@@ -16,12 +12,4 @@ export default class ReservationConstructor {
     @Property()
     @Required()
     deskName: string;
-
-    @Property()
-    @Required()
-    startTime: Date;
-
-    @Property()
-    @Required()
-    endTime: Date
 }

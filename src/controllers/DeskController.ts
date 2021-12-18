@@ -1,15 +1,15 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
 import { InternalServerError, NotFound } from "@tsed/exceptions";
-import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Example, Format, Get, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import DeskMapper from "../models/Desks/DeskMapper";
 import Reservation from "../models/Reservation/Reservation";
 import GraphQLService from "../services/GraphQLService";
-import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
+import ReservationMapper from "../models/Reservation/ReservationMapper";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
@@ -57,43 +57,63 @@ export class DeskController {
   @Summary("Get 🎭 reservations of a 🔑-identified desk")
   @(Returns(200, Array).Of(MaskedReservation))
   @(Returns(404).Description("Not Found"))
-  getReservationsPerRoom(
+  async getReservationsPerRoom(
     @PathParams("buildingId")
-    bId: string,
+    buildingId: string,
     @PathParams("roomName")
     roomName: string,
     @PathParams("deskName")
     deskName: string,
     @QueryParams("day")
-    @Required()
     @Example("yyyy-MM-dd")
     @Format("regex")
     day: string
-  ): Array<MaskedReservation> {
+  ): Promise<Array<MaskedReservation>> {
     const dayData: Array<number> = day.split("-").map(int => parseInt(int))
-    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2])
-    const json: Array<MaskedReservation> = []
-    for (let i = 0; i < 10; i++) {
-      const element = {
-        id: Math.floor(200).toString(),
-        room: {
-          id: roomName,
-          name: `R&D Room`
-        },
-        building: {
-          id: bId,
-          name: `The Spire`
-        },
-        desk: {
-          id: deskName,
-          name: `Desk ${i}`
-        },
-        startTime: new Date(),
-        endTime: new Date()
+    const refDate: Date = new Date(dayData[0], dayData[1], dayData[2]);
+
+    // If date object is invalid it will return NaN. NaN is never equal to itself
+    if(refDate.getTime() !== refDate.getTime()) {
+      throw new InternalServerError("The given date is invalid");
+    }
+  
+    const query = gql`
+    query getDeskReservations($id: String!, $roomName: String!, $deskName: String!, $date: DateTime) {
+      building(id: $id) {
+        _id
+        name
+        rooms(name: $roomName){
+          name
+          desks(name: $deskName) {
+            name
+            bookings(at: $date) {
+              _id
+              start_time
+              end_time
+            }
+          }
+        }
       }
-      json.push(element);
-    };
-    return json.filter(reservation => fullDateCheck(reservation.startTime, refDate))
+    }   
+    `;
+
+    try {
+      const result = await GraphQLService.request(query, {id: buildingId, roomName: roomName, deskName: deskName, date: refDate});
+      const deskReservations = result as any;
+
+      let reservations = [] as Array<MaskedReservation>;
+      const building = deskReservations.building;
+      const room = building.rooms[0];
+      const desk = room.desks[0];
+
+      desk.bookings.forEach((reservation : any) => {
+        reservations.push(ReservationMapper.mapReservation(building, room, desk, reservation, false));
+      });
+
+      return reservations;
+    } catch(error) {
+      throw new InternalServerError(error.response.errors[0].message);
+    }
   }
 
   static async getDesks(buildingId: string, 

@@ -1,5 +1,4 @@
 import MaskedReservation from "../Reservation/MaskedReservation";
-import Reservation from "./Reservation";
 
 export default class ReservationMapper {
     // Map GraphQL reservation to the correct format for the API
@@ -33,5 +32,6 @@ export default class ReservationMapper {
 
         return reservation;
     }
+
 }
   

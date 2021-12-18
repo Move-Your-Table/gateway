@@ -1,18 +1,6 @@
 import { Minimum, Property, Required } from "@tsed/schema";
+import ReservationConstructor from "./ReservationConstructor";
 
-export default class ReservationConstructor {
-    @Property()
-    buildingId: string;
+export default class ReservationMutator extends ReservationConstructor {
 
-    @Property()
-    roomName: string;
-
-    @Property()
-    deskName?: string;
-
-    @Property()
-    startTime: Date;
-
-    @Property()
-    endTime: Date
 }
