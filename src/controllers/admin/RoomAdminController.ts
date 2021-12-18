@@ -175,16 +175,12 @@ export class RoomAdminController {
     `;
 
     const deleteRoomQuery = gql`
-    mutation deleteroom {
-      removeRoom(
-        buildingId: "61bd136e80b2485adc82711e",
-        roomName: "yeet"
+    mutation deleteroom($id: String!, $roomName: String!) {
+      removeRoom (
+        buildingId: $id,
+        roomName: $roomName
       ) {
-        deskCount
         name
-        type
-        floor
-        features
       }
     }
     `;
@@ -193,7 +189,9 @@ export class RoomAdminController {
       const buildingRes = await GraphQLService.request(buildingQuery, {id: buildingId, roomName: roomName});
       const building = buildingRes.building as any;
 
+      console.log("BUILD", building);
       let room = building.rooms[0];
+      console.log("ROOM", room);
 
       let reservations = [] as Array<MaskedReservation | Reservation>;
       building.rooms.forEach((room : any) => {
@@ -204,8 +202,8 @@ export class RoomAdminController {
         });
       });
 
-      //await GraphQLService.request(deleteRoomQuery, {id:buildingId, roomName: roomName});
-      
+      await GraphQLService.request(deleteRoomQuery, {id:buildingId, roomName: roomName});
+
       return {
         roomName: room.name,
         type: room.type,
