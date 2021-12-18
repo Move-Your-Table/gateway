@@ -31,8 +31,10 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 
 - For [Back-End](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/back-end), clone the project, navigate to the root of the project and perform the following command:
   ```bash
-  $ yarn start:container:prod
+  $ yarn start:container:dev
   ```
+  > :warning: Currently, the GraphQL implementation in the production container seems to be broken, so we suggest using the development version for now.
+
 - For [Automation API](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/projects/hybrid-work1/automateapi), clone the project, navigate to the root of the project and perform the following command:
   ```bash
   $ docker-compose up rust_prod -d
