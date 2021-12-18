@@ -19,7 +19,7 @@ export class ReservationController {
   @Returns(200, Array).Of(Reservation)
   async getReservations(@QueryParams("userId") @Required() @Minimum(0) userId: string): Promise<Array<MaskedReservation | Reservation>> {
     const query = gql`
-      query getReservations {
+      query getReservations($userId: String!) {
         buildings {
           _id
           name
@@ -27,7 +27,7 @@ export class ReservationController {
             name
             desks {
               name
-              bookings(user_id: "61ba0ac1ebca734c1827fbd4") {
+              bookings(user_id: $userId) {
                 _id
                 start_time
                 end_time
@@ -44,7 +44,7 @@ export class ReservationController {
       }
     `
 
-    const result = await GraphQLService.request(query, {user_id: userId});
+    const result = await GraphQLService.request(query, {userId: userId});
     const buildingReservations = result.buildings as any;
 
     let reservations = [] as Array<MaskedReservation | Reservation>;
