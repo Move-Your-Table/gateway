@@ -205,6 +205,7 @@ export class RoomAdminController {
       });
 
       //await GraphQLService.request(deleteRoomQuery, {id:buildingId, roomName: roomName});
+      
       return {
         roomName: room.name,
         type: room.type,
