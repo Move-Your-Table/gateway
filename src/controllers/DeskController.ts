@@ -1,16 +1,15 @@
 import { PathParams, QueryParams } from "@tsed/common";
 import {Controller} from "@tsed/di";
 import { InternalServerError, NotFound } from "@tsed/exceptions";
-import { Example, Format, Get, Required, Returns, Summary, Tags } from "@tsed/schema";
+import { Example, Format, Get, Returns, Summary, Tags } from "@tsed/schema";
 import { Docs } from "@tsed/swagger";
 import { gql } from "graphql-request";
 import DeskMapper from "../models/Desks/DeskMapper";
 import Reservation from "../models/Reservation/Reservation";
 import GraphQLService from "../services/GraphQLService";
-import { fullDateCheck } from "../helpers/date";
 import Desk from "../models/Desks/Desk";
 import MaskedReservation from "../models/Reservation/MaskedReservation";
-import ReservationMapper from "src/models/Reservation/ReservationMapper";
+import ReservationMapper from "../models/Reservation/ReservationMapper";
 
 @Controller("/building/:buildingId/room/:roomName/desks")
 @Docs("general-api")
