@@ -6,7 +6,7 @@ import { gql } from "graphql-request";
 import GraphQLService from "../services/GraphQLService";
 import Building from "../models/Building/Building";
 import BuildingMapper from "../models/Building/BuildingMapper";
-import { InternalServerError } from "@tsed/exceptions";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 
 @Controller("/buildings")
 @Tags("Buildings")
@@ -62,9 +62,10 @@ export class BuildingController {
     try {
       const result = await GraphQLService.request(query, {id: id});
       const building = result.building as any;
+
       return BuildingMapper.mapBuilding(building);
     } catch(error) {
-      throw new InternalServerError(error.response.errors[0].message);
+      throw new NotFound("Building not found.");
     }
   }
 }

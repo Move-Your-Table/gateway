@@ -11,7 +11,7 @@ import MaskedReservation from "../../models/Reservation/MaskedReservation";
 import Reservation from "../../models/Reservation/Reservation";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
-import { InternalServerError } from "@tsed/exceptions";
+import { InternalServerError, NotFound } from "@tsed/exceptions";
 
 @Controller("/admin/building/:buildingId/room/:roomName/desks")
 @Docs("admin-api")
@@ -39,8 +39,14 @@ export class DeskAdminController {
   @PathParams("roomName") roomName: string, 
   @PathParams("deskName") deskName: string,
   @QueryParams("incidents") showWithIncidents: boolean = false,
-  ): Promise<Array<Desk<MaskedReservation|Reservation>>> {
-    return await DeskController.getDesks(bId, roomName, deskName, true, showWithIncidents);
+  ): Promise<Desk<MaskedReservation|Reservation>> {
+    const desks = await DeskController.getDesks(bId, roomName, deskName, true, showWithIncidents);
+
+    if(desks.length === 0) {
+      throw new NotFound("Desk not found.");
+    } else {
+      return desks[0];
+    }
   }
 
   @Post()
