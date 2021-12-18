@@ -11,7 +11,7 @@ import { RoomController } from "../RoomController";
 import { gql } from "graphql-request";
 import GraphQLService from "../../services/GraphQLService";
 import { InternalServerError, NotFound } from "@tsed/exceptions";
-import ReservationMapper from "src/models/Reservation/ReservationMapper";
+import ReservationMapper from "../../models/Reservation/ReservationMapper";
 
 @Controller("/admin/building/:buildingId/room")
 @Docs("admin-api")
