@@ -13,7 +13,7 @@ MYT Gateway is... the gateway to our application based on [Ts.ED](https://tsed.i
    ```bash
    $ git clone git@git.ti.howest.be:TI/2021-2022/s5/trending-topics/projects/hybrid-work1/gateway.git
    ```
-2. Run npm install:
+2. Run yarn install:
    ```bash
    $ yarn install
    ```
