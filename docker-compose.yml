@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Tsed_Dev_Dockerfile
-    image: moveyourtable.azurecr.io/gateway
+    image: myt/gateway:dev
     ports:
       - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     volumes:
@@ -29,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Tsed_Prod_Dockerfile
-    image: myt/gateway:prod
+    image: moveyourtable.azurecr.io/gateway
     ports:
       - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     environment:
