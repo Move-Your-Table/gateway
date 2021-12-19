@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Tsed_Dev_Dockerfile
-    image: myt/gateway:dev
+    image: moveyourtable.azurecr.io/gateway
     ports:
       - "${TSED_PORT}:8080"
     volumes:
