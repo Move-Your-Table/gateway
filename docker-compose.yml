@@ -6,7 +6,7 @@ services:
       dockerfile: ./docker/Tsed_Dev_Dockerfile
     image: moveyourtable.azurecr.io/gateway
     ports:
-      - "${TSED_PORT}:8080"
+      - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
@@ -31,7 +31,7 @@ services:
       dockerfile: ./docker/Tsed_Prod_Dockerfile
     image: myt/gateway:prod
     ports:
-      - "${TSED_PORT}:8080"
+      - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     environment:
       - TSED_PORT=${TSED_PORT}
       - BACK_END_ENDPOINT=${DOCKER_BACK_END_ENDPOINT}
