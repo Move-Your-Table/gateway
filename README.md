@@ -61,12 +61,12 @@ Because [Gateway](https://git.ti.howest.be/TI/2021-2022/s5/trending-topics/proje
 |TSED_PORT|The port used by the application|✔|✔|✔|8080|
 |TSED_EXPOSE_PORT|The port used by the docker container to expose the application|✔* <br/> *\*If the code is running within a container*|✔|✔|8080|
 |||||||
-|DOCKER_AUTOMATE_API_ENDPOINT|The endpoint used by the application to reach the automate server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|localhost|
+|DOCKER_AUTOMATE_API_ENDPOINT|The endpoint used by the application to reach the automate server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|http://localhost|
 |DOCKER_AUTOMATE_API_PORT|The port used by the application to reach the automate server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|3000|
-|DOCKER_BACK_END_ENDPOINT|The endpoint used by the application to reach the back-end server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|localhost|
+|DOCKER_BACK_END_ENDPOINT|The endpoint used by the application to reach the back-end server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|http://localhost|
 |DOCKER_BACK_END_PORT|The port used by the application to reach the back-end server **if run within a container**|✔* </br> *\*If the code's running in a container*|✖|✖|8080|
 |||||||
-|AUTOMATE_API_ENDPOINT|The endpoint used by the application to reach the automate server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|localhost|
+|AUTOMATE_API_ENDPOINT|The endpoint used by the application to reach the automate server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|http://localhost|
 |AUTOMATE_API_PORT|The port used by the application to reach the automate server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|3000|
-|BACK_END_ENDPOINT|The endpoint used by the application to reach the back-end server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|localhost|
+|BACK_END_ENDPOINT|The endpoint used by the application to reach the back-end server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|http://localhost|
 |BACK_END_PORT|The port used by the application to reach the back-end server **if run locally**|✔* </br> *\*If the code's running locally*|✖|✖|8080|
