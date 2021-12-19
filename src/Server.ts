@@ -16,7 +16,7 @@ import { IndexCtrl } from "./controllers/pages/IndexController";
   ...config,
   acceptMimes: ["application/json"],
   httpPort: process.env.TSED_PORT || 8083,
-  httpsPort: false, // CHANGE
+  httpsPort: true, // CHANGE
   mount: {
     "/rest": [`${rootDir}/controllers/**/*.ts`],
     "/": [IndexCtrl]
@@ -57,10 +57,6 @@ export class Server {
       .use(compress({}))
       .use(methodOverride())
       .use(bodyParser.json())
-      .use(
-        bodyParser.urlencoded({
-          extended: true
-        })
-      );
+      .use(bodyParser.urlencoded({ extended: true }));
   }
 }

@@ -6,7 +6,7 @@ services:
       dockerfile: ./docker/Tsed_Dev_Dockerfile
     image: myt/gateway:dev
     ports:
-      - "${TSED_PORT}:8080"
+      - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
@@ -14,11 +14,11 @@ services:
     tty: true         # -t
     container_name: Gateway-Dev
     environment:
-      - TSED_PORT=8080
-      - BACK_END_ENDPOINT=nestjs
-      - BACK_END_PORT=3000
-      - AUTOMATION_API_ENDPOINT=rust
-      - AUTOMATION_API_PORT=3030
+      - TSED_PORT=${TSED_PORT}
+      - BACK_END_ENDPOINT=${DOCKER_BACK_END_ENDPOINT}
+      - BACK_END_PORT=${DOCKER_BACK_END_PORT}
+      - AUTOMATION_API_ENDPOINT=${DOCKER_AUTOMATION_API_ENDPOINT}
+      - AUTOMATION_API_PORT=${DOCKER_AUTOMATION_API_PORT}
     networks:
       default:
         aliases:
@@ -29,15 +29,15 @@ services:
     build:
       context: .
       dockerfile: ./docker/Tsed_Prod_Dockerfile
-    image: myt/gateway:prod
+    image: moveyourtable.azurecr.io/gateway
     ports:
-      - "${TSED_PORT}:8080"
+      - "${TSED_EXPOSE_PORT}:${TSED_PORT}"
     environment:
-      - TSED_PORT=8080
-      - BACK_END_ENDPOINT=nestjs
-      - BACK_END_PORT=3000
-      - AUTOMATION_API_ENDPOINT=rust
-      - AUTOMATION_API_PORT=3030
+      - TSED_PORT=${TSED_PORT}
+      - BACK_END_ENDPOINT=${DOCKER_BACK_END_ENDPOINT}
+      - BACK_END_PORT=${DOCKER_BACK_END_PORT}
+      - AUTOMATION_API_ENDPOINT=${DOCKER_AUTOMATION_API_ENDPOINT}
+      - AUTOMATION_API_PORT=${DOCKER_AUTOMATION_API_PORT}
     networks:
       default:
         aliases:

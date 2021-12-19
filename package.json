@@ -1,15 +1,15 @@
 {
-  "name": "gateway",
+  "name": "myt-gateway",
   "version": "1.0.0",
   "description": "",
   "scripts": {
     "build": "yarn run tsc",
     "tsc": "tsc --project tsconfig.compile.json",
     "tsc:w": "tsc --project tsconfig.json -w",
-    "start:container": "docker-compose stop && docker-compose up -d tsed_dev",
+    "start:container": "docker-compose down && docker-compose up -d tsed_dev",
     "start": "tsnd --inspect --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "start:prod": "cross-env NODE_ENV=production node dist/index.js",
-    "start:container:prod": "docker-compose up -d --build tsed_prod",
+    "start:container:prod": "docker-compose stop && docker-compose up -d --build tsed_prod",
     "test:lint": "eslint src --ext .ts",
     "test:lint:fix": "eslint src --ext .ts --fix",
     "prettier": "prettier '{src,test}/**/*.ts' --write"
